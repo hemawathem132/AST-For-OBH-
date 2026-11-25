@@ -1,0 +1,2675 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบแปลผลและตรวจสอบความไวต่อยาต้านจุลชีพ | CLSI M100-Ed36 (2026) & M45</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Sarabun"', '"Noto Sans Thai"', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Sarabun', 'Noto Sans Thai', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .badge-S { background-color: #dcfce7; color: #166534; border: 1px solid #86efac; }
+    .badge-I { background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .badge-SDD { background-color: #e0f2fe; color: #075985; border: 1px solid #7dd3fc; }
+    .badge-R { background-color: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .badge-NS { background-color: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; }
+    .badge-NONE { background-color: #f1f5f9; color: #64748b; border: 1px solid #e2e8f0; }
+
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.35); }
+      50% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); }
+    }
+    .mdro-pulse { animation: pulse-red 2s infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ==================== HEADER ==================== -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-5 0v5.5a3.5 3.5 0 01-1.025 2.475L5.5 14.45A3 3 0 007.621 19.5h8.758a3 3 0 002.121-5.05l-3.475-3.475A3.5 3.5 0 0114 8.5V3" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold text-slate-800 leading-tight">
+            ระบบแปลผลและตรวจสอบความไวต่อยาต้านจุลชีพ (AST)
+          </h1>
+          <p class="text-xs text-slate-500">
+            มาตรฐาน <span class="font-semibold text-sky-700">CLSI M100-Ed36 (2026)</span> &amp; <span class="font-semibold text-indigo-700">CLSI M45 (3rd ed.)</span> • เกณฑ์เชื้อดื้อยา: นับเฉพาะผล <span class="font-bold text-red-600">R</span> เท่านั้น (ไม่นับ I / SDD)
+          </p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Tabs -->
+      <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto relative z-50">
+        <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 flex-1 sm:flex-none">
+          <button
+            type="button"
+            id="tabBtnManual"
+            class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-sky-700 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            แปลผลยา (กรอกค่าเอง)
+          </button>
+          <button
+            type="button"
+            id="tabBtnPhoto"
+            class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            ตรวจสอบจากรูปถ่าย (รองรับหลายเชื้อ)
+          </button>
+        </div>
+
+        <!-- API Key Settings Button with Live Status Badge -->
+        <button
+          type="button"
+          id="openApiSettingsBtn"
+          onclick="openApiSettingsModal()"
+          class="px-3 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 shadow-sm text-xs font-semibold text-slate-700 transition flex items-center gap-2 cursor-pointer"
+          title="ตั้งค่า Gemini API Key สำหรับอ่านรูปถ่ายด้วย AI"
+        >
+          <span>⚙️ ตั้งค่า AI API Key</span>
+          <span id="apiStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
+            ยังไม่ตั้งค่า API Key
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- MDRO Alert Banner (Only for the 8 strict MDRO groups) -->
+    <div id="mdroBanner" class="hidden mb-5 rounded-2xl bg-red-50 border-2 border-red-300 p-4 shadow-sm mdro-pulse">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-sm font-bold text-red-800 uppercase tracking-wide">แจ้งเตือนเชื้อดื้อยาสำคัญ (MDRO Alert):</span>
+              <div id="mdroBannerBadges" class="flex flex-wrap gap-1.5"></div>
+            </div>
+            <p id="mdroBannerReason" class="text-xs sm:text-sm text-red-700 mt-1"></p>
+          </div>
+        </div>
+        <button type="button" onclick="openMdroModal()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition shrink-0 cursor-pointer">
+          ดูรายละเอียดแจ้งเตือน
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 1: AST INTERPRETER ==================== -->
+    <section id="sectionManual" class="space-y-5">
+      <!-- Top Control Card -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <!-- Organism Autocomplete -->
+          <div class="flex-1 relative">
+            <label for="organismSearch" class="block text-sm font-semibold text-slate-700 mb-1.5">
+              ค้นหาและเลือกชื่อเชื้อ (Organism) <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                id="organismSearch"
+                autocomplete="off"
+                placeholder="พิมพ์ชื่อเชื้อ เช่น E. coli, Klebsiella, S. aureus, Acinetobacter, Pseudomonas, Enterococcus, Aeromonas..."
+                class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm bg-slate-50 focus:bg-white transition"
+              />
+              <svg class="w-5 h-5 text-slate-400 absolute left-3 top-3 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <button type="button" id="clearOrgBtn" onclick="clearOrganismSearch()" class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer" title="ล้างคำค้นหา">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <!-- Autocomplete Dropdown -->
+            <div id="organismDropdown" class="hidden absolute z-30 mt-1 w-full bg-white rounded-xl border border-slate-200 shadow-xl max-h-80 overflow-y-auto divide-y divide-slate-100"></div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="window.switchTab('photo')" class="px-3.5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              แนบรูปถ่ายตรวจสอบ (รองรับหลายเชื้อ)
+            </button>
+
+            <button type="button" onclick="recalculateMainTable()" class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              คำนวณผลลัพธ์ใหม่
+            </button>
+
+            <div class="relative">
+              <button type="button" onclick="toggleDemoMenu()" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 border border-slate-200 cursor-pointer">
+                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                เคสตัวอย่าง (Demo)
+              </button>
+              <div id="demoMenu" class="hidden absolute right-0 mt-1.5 w-72 bg-white rounded-xl border border-slate-200 shadow-xl z-30 p-1.5 space-y-1">
+                <button type="button" onclick="loadDemoCase('cre_esbl')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-xs cursor-pointer">
+                  <div class="font-bold text-slate-800">1. K. pneumoniae (CRE + ESBL)</div>
+                  <div class="text-slate-500">Meropenem R, Ceftriaxone R → ป้อบอัพ CRE &amp; ESBL</div>
+                </button>
+                <button type="button" onclick="loadDemoCase('mrsa')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-xs cursor-pointer">
+                  <div class="font-bold text-slate-800">2. S. aureus (MRSA)</div>
+                  <div class="text-slate-500">Cefoxitin Disk 18 mm (R) → ป้อบอัพ MRSA</div>
+                </button>
+                <button type="button" onclick="loadDemoCase('vre')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-xs cursor-pointer">
+                  <div class="font-bold text-slate-800">3. E. faecium (VRE)</div>
+                  <div class="text-slate-500">Vancomycin MIC >=32 (R) → ป้อบอัพ VRE</div>
+                </button>
+                <button type="button" onclick="loadDemoCase('crab')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-xs cursor-pointer">
+                  <div class="font-bold text-slate-800">4. A. baumannii (CRAB)</div>
+                  <div class="text-slate-500">Meropenem R, Imipenem R → ป้อบอัพ CRAB</div>
+                </button>
+                <button type="button" onclick="loadDemoCase('crab_i_only')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-xs cursor-pointer">
+                  <div class="font-bold text-slate-800">5. A. baumannii (ผล I เท่านั้น)</div>
+                  <div class="text-slate-500">Meropenem MIC 4 (I) → ต้องไม่แจ้งเตือน CRAB</div>
+                </button>
+                <button type="button" onclick="loadDemoCase('susceptible')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sky-50 text-xs cursor-pointer">
+                  <div class="font-bold text-slate-800">6. E. coli (ไวต่อยาปกติ)</div>
+                  <div class="text-slate-500">ผล S ทั้งหมด ไม่มีแจ้งเตือน MDRO</div>
+                </button>
+              </div>
+            </div>
+
+            <button type="button" onclick="copyReport()" class="px-3.5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+              คัดลอกรายงานผล
+            </button>
+
+            <button type="button" onclick="clearAllInputs()" class="px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-600 border border-slate-300 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 cursor-pointer">
+              ล้างข้อมูล
+            </button>
+          </div>
+        </div>
+
+        <!-- Selected Organism Info Strip -->
+        <div id="organismInfoCard" class="hidden mt-4 pt-4 border-t border-slate-100">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 id="orgTitle" class="text-base sm:text-lg font-bold text-slate-800"></h2>
+                <span id="orgSourceBadge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold"></span>
+                <span id="orgTableBadge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600"></span>
+              </div>
+              <p id="orgConditions" class="text-xs text-slate-500 mt-1"></p>
+            </div>
+            <!-- Live Summary Counters -->
+            <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">กรอกแล้ว: <span id="statEntered">0</span></span>
+              <span class="px-2.5 py-1 rounded-lg badge-S">S: <span id="statS">0</span></span>
+              <span class="px-2.5 py-1 rounded-lg badge-SDD">SDD: <span id="statSDD">0</span></span>
+              <span class="px-2.5 py-1 rounded-lg badge-I">I: <span id="statI">0</span></span>
+              <span class="px-2.5 py-1 rounded-lg badge-R">R: <span id="statR">0</span></span>
+            </div>
+          </div>
+          <div id="orgIntrinsicBox" class="hidden mt-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
+            <svg class="w-4 h-4 shrink-0 mt-0.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div><span class="font-bold">Intrinsic Resistance / ข้อควรระวัง:</span> <span id="orgIntrinsicText"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drug Table Container -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-200 bg-slate-50/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="relative flex-1 max-w-md">
+            <input
+              type="text"
+              id="drugFilterInput"
+              oninput="renderDrugTable()"
+              placeholder="ค้นหาชื่อยา ตัวย่อ หรือกลุ่มยา ในตารางนี้..."
+              class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <label class="inline-flex items-center gap-2 text-xs sm:text-sm text-slate-700 font-medium cursor-pointer select-none">
+              <input type="checkbox" id="onlyFilledToggle" onchange="renderDrugTable()" class="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300" />
+              แสดงเฉพาะยาที่กรอกค่าแล้ว
+            </label>
+            <button type="button" onclick="openCustomDrugModal()" class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 text-xs font-semibold transition flex items-center gap-1 cursor-pointer">
+              + เพิ่มยาเอง
+            </button>
+          </div>
+        </div>
+
+        <div id="emptyState" class="p-12 text-center text-slate-500">
+          <p class="text-base font-semibold text-slate-700">กรุณาค้นหาและเลือกชื่อเชื้อด้านบน</p>
+          <p class="text-xs text-slate-500 mt-1">ระบบจะแสดงรายการยาและเกณฑ์จุดตัดตาม CLSI M100-Ed36 (2026) / M45 โดยอัตโนมัติ</p>
+        </div>
+
+        <div id="tableWrapper" class="hidden overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100/80 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">
+                <th class="py-3 px-4 w-60">ชื่อยาต้านจุลชีพ (Agent)</th>
+                <th class="py-3 px-3 w-36">Disk (mm)</th>
+                <th class="py-3 px-3 w-40">MIC (µg/mL)</th>
+                <th class="py-3 px-3 w-36 text-center">แปลผล (Result)</th>
+                <th class="py-3 px-4">เกณฑ์อ้างอิง CLSI (Breakpoints)</th>
+              </tr>
+            </thead>
+            <tbody id="drugTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: PHOTO VERIFICATION / AI & VISUAL AUDIT (MULTI-ORGANISM) ==================== -->
+    <section id="sectionPhoto" class="hidden space-y-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <!-- Left Column: Sticky Upload & Image Viewer -->
+        <div class="lg:col-span-5 lg:sticky lg:top-20 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              แนบรูปถ่ายใบรายงานผล AST
+            </h2>
+            <span class="text-[11px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200">รองรับ 2+ เชื้อ / Ctrl+V</span>
+          </div>
+          <p class="text-xs text-slate-500 mb-4">รองรับไฟล์ JPG, PNG, WebP (หากในรูปมี 2 เชื้อขึ้นไป AI จะแยกการ์ดและตารางยาให้อัตโนมัติ)</p>
+
+          <!-- Dropzone / Viewer -->
+          <div
+            id="dropZone"
+            onclick="triggerPhotoFileInput()"
+            ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)"
+            ondrop="handleDrop(event)"
+            class="border-2 border-dashed border-slate-300 hover:border-sky-500 hover:bg-sky-50/40 rounded-2xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[280px] relative overflow-hidden"
+          >
+            <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleFileSelect(event)" />
+
+            <div id="uploadPlaceholder">
+              <svg class="w-12 h-12 mx-auto text-sky-500/70 mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              <p class="text-sm font-semibold text-slate-700">คลิกเพื่อเลือกรูปภาพ ลากไฟล์มาวาง หรือกด Ctrl+V</p>
+              <p class="text-xs text-slate-400 mt-1">ระบบ AI จะแยกชื่อเชื้อทั้งหมดในรูป ค่า Disk/MIC และผลแปลเทียบกับ CLSI 2026</p>
+            </div>
+
+            <div id="imagePreviewContainer" class="hidden w-full flex flex-col items-center">
+              <div class="w-full h-80 overflow-auto rounded-xl border border-slate-200 bg-slate-100 flex items-center justify-center p-2" onclick="event.stopPropagation()">
+                <img id="imagePreview" src="" alt="ตัวอย่างใบผล AST" class="max-h-full max-w-full object-contain transition-transform duration-200 origin-center" />
+              </div>
+              <!-- Image Controls -->
+              <div class="mt-3 flex flex-wrap items-center justify-center gap-1.5" onclick="event.stopPropagation()">
+                <button type="button" onclick="adjustImageZoom(0.25)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">ซูมเข้า +</button>
+                <button type="button" onclick="adjustImageZoom(-0.25)" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">ซูมออก -</button>
+                <button type="button" onclick="rotatePreviewImage()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">หมุน 90°</button>
+                <button type="button" onclick="resetImageTransform()" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer">รีเซ็ต</button>
+                <button type="button" onclick="openZoomModal()" class="px-2.5 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-semibold cursor-pointer">เต็มจอ</button>
+                <button type="button" onclick="clearPhoto()" class="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 text-xs font-semibold cursor-pointer">เปลี่ยนรูป</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="mt-4 flex flex-col gap-2">
+            <button
+              type="button"
+              id="verifyPhotoBtn"
+              onclick="verifyPhotoWithAI()"
+              class="w-full py-3 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm shadow-sm transition flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              วิเคราะห์รูปถ่ายด้วย AI (รองรับหลายเชื้อ)
+            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button
+                type="button"
+                onclick="startManualPhotoAudit()"
+                class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 font-semibold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <svg class="w-4 h-4 text-sky-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                กรอกค่าตรวจสอบด้วยตาเอง
+              </button>
+              <button
+                type="button"
+                onclick="loadMultiOrganismPhotoDemo()"
+                class="py-2.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-semibold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                โหลดตัวอย่าง 2 เชื้อในรูปเดียว
+              </button>
+            </div>
+          </div>
+
+          <!-- Error Box -->
+          <div id="photoErrorBox" class="hidden mt-3 p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700"></div>
+        </div>
+
+        <!-- Right Column: Multi-Organism Audit Cards -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Audit Toolbar Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-800">ผลการตรวจสอบความถูกต้อง (Multi-Organism Audit)</h2>
+              <p class="text-xs text-slate-500">แยกการ์ดตามเชื้อที่พบในรูป แก้ไขค่าตรวจสอบด้วยตาได้ทุกช่อง</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onclick="addAuditIsolate()"
+                class="px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-semibold transition flex items-center gap-1 cursor-pointer"
+              >
+                + เพิ่มเชื้อที่พบในรูป
+              </button>
+              <button
+                type="button"
+                id="recalcAllAuditBtn"
+                onclick="recalculateAllAuditIsolates(true)"
+                class="hidden px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5 cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                คำนวณผลลัพธ์ใหม่ทั้งหมดทุกเชื้อ
+              </button>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div id="aiLoadingState" class="hidden bg-white rounded-2xl border border-slate-200 shadow-sm py-16 px-5 text-center">
+            <div class="w-10 h-10 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-sm font-semibold text-slate-700">กำลังวิเคราะห์รูปถ่ายด้วย AI (ตรวจจับทุกเชื้อในรูป)...</p>
+            <p class="text-xs text-slate-400 mt-1">ระบบกำลังแยกเชื้อที่ 1, เชื้อที่ 2, ... และเทียบเกณฑ์ CLSI 2026</p>
+          </div>
+
+          <!-- Empty State -->
+          <div id="aiEmptyState" class="bg-white rounded-2xl border border-slate-200 shadow-sm py-16 px-5 text-center text-slate-400">
+            <svg class="w-12 h-12 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            <p class="text-sm font-semibold text-slate-600">ยังไม่มีผลการตรวจสอบจากรูปถ่าย</p>
+            <p class="text-xs mt-1">แนบรูปถ่ายแล้วกด "วิเคราะห์รูปถ่ายด้วย AI" หรือกด "โหลดตัวอย่าง 2 เชื้อในรูปเดียว" เพื่อทดสอบ</p>
+          </div>
+
+          <!-- Container for Multi-Organism Cards -->
+          <div id="auditIsolatesContainer" class="hidden space-y-5"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400">
+      Microbiology AST Interpreter &amp; Multi-Organism Photo Audit • อ้างอิง CLSI M100 36th Edition (2026) และ CLSI M45 3rd Edition • เกณฑ์ MDRO นับเฉพาะผล R เท่านั้น
+    </div>
+  </footer>
+
+  <!-- ==================== MDRO ALERT MODAL POPUP ==================== -->
+  <div id="mdroModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border-2 border-red-400 overflow-hidden">
+      <div class="bg-red-600 text-white px-5 py-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold leading-tight">แจ้งเตือนเชื้อดื้อยาสำคัญ (MDRO Alert)</h3>
+          <p class="text-xs text-red-100">ตรวจพบเชื้อดื้อยาใน 8 กลุ่มเฝ้าระวังหลัก (นับเฉพาะผล R เท่านั้น)</p>
+        </div>
+      </div>
+      <div class="p-5 space-y-4 max-h-[65vh] overflow-y-auto">
+        <div class="text-sm text-slate-600">
+          เชื้อที่ตรวจพบ: <span id="modalOrgName" class="font-bold text-slate-900"></span>
+        </div>
+        <div id="modalMdroList" class="space-y-2.5"></div>
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+          <strong>คำแนะนำเบื้องต้น:</strong> ตรวจสอบความถูกต้องของการระบุชนิดเชื้อและผลความไวต่อยาซ้ำตามแนวทางห้องปฏิบัติการ และแจ้งหน่วยงานควบคุมการติดเชื้อ (IC) ตามมาตรการโรงพยาบาล
+        </div>
+      </div>
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end">
+        <button type="button" onclick="closeMdroModal()" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-sm transition cursor-pointer">
+          รับทราบ / ปิดหน้าต่าง
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CUSTOM DRUG MODAL ==================== -->
+  <div id="customDrugModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-xl border border-slate-200 overflow-hidden">
+      <div class="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-800">เพิ่มรายการยาเองในตาราง</h3>
+        <button type="button" onclick="closeCustomDrugModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+      </div>
+      <div class="p-5 space-y-3 text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อยาต้านจุลชีพ *</label>
+          <input type="text" id="customDrugName" placeholder="เช่น Tigecycline, Cefoperazone-sulbactam" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">กลุ่มยา (Class)</label>
+          <input type="text" id="customDrugClass" placeholder="เช่น Glycylcyclines, Other" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+        </div>
+        <p class="text-xs text-slate-500">หมายเหตุ: ยาที่เพิ่มเองจะไม่มีเกณฑ์จุดตัดอัตโนมัติในฐานข้อมูล CLSI สามารถกรอกค่าเพื่อบันทึกรายงานผลได้</p>
+      </div>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+        <button type="button" onclick="closeCustomDrugModal()" class="px-4 py-2 rounded-xl bg-white border border-slate-300 text-xs font-semibold text-slate-600 cursor-pointer">ยกเลิก</button>
+        <button type="button" onclick="saveCustomDrug()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold cursor-pointer">เพิ่มยา</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== IMAGE ZOOM MODAL ==================== -->
+  <div id="zoomModal" onclick="closeZoomModal()" class="hidden fixed inset-0 z-50 bg-slate-900/85 flex items-center justify-center p-4 cursor-zoom-out">
+    <img id="zoomImage" src="" alt="ขยายภาพใบผล" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl object-contain" />
+  </div>
+
+  <!-- ==================== GEMINI API KEY SETTINGS MODAL ==================== -->
+  <div id="apiSettingsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold">⚙️</div>
+          <div>
+            <h3 class="text-base font-bold text-slate-800">ตั้งค่า Gemini API Key (สำหรับ AI อ่านรูปถ่าย)</h3>
+            <p class="text-[11px] text-slate-500">ใช้เมื่อเผยแพร่เว็บแอปเป็นลิงก์สาธารณะ (Netlify / GitHub Pages)</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeApiSettingsModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4 text-sm">
+        <!-- API Key Input -->
+        <div>
+          <label for="geminiApiKeyInput" class="block text-xs font-bold text-slate-700 mb-1.5">
+            Gemini API Key <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <input
+              type="password"
+              id="geminiApiKeyInput"
+              autocomplete="off"
+              placeholder="วาง API Key ที่ขึ้นต้นด้วย AIza..."
+              class="w-full pl-3 pr-16 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm font-mono"
+            />
+            <button
+              type="button"
+              id="toggleApiKeyVisBtn"
+              onclick="toggleApiKeyVisibility()"
+              class="absolute right-2 top-1.5 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold cursor-pointer"
+            >
+              แสดง
+            </button>
+          </div>
+        </div>
+
+        <!-- Model Selector -->
+        <div>
+          <label for="geminiModelSelect" class="block text-xs font-bold text-slate-700 mb-1.5">
+            รุ่นโมเดล AI (Gemini Model)
+          </label>
+          <select
+            id="geminiModelSelect"
+            class="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white focus:ring-2 focus:ring-sky-500 focus:border-sky-500 text-sm text-slate-800"
+          >
+            <option value="gemini-2.5-flash">gemini-2.5-flash (แนะนำ — แม่นยำและรวดเร็ว)</option>
+            <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
+          </select>
+        </div>
+
+        <!-- Test Result Message -->
+        <div id="apiTestResultBox" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+
+        <!-- How to get free API Key -->
+        <div class="p-3.5 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 space-y-1.5">
+          <div class="font-bold flex items-center justify-between">
+            <span>วิธีขอ Gemini API Key ฟรี:</span>
+            <a
+              href="https://aistudio.google.com/apikey"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold transition inline-flex items-center gap-1"
+            >
+              เปิด Google AI Studio ↗
+            </a>
+          </div>
+          <ol class="list-decimal list-inside space-y-0.5 text-sky-800">
+            <li>คลิกปุ่ม <strong>เปิด Google AI Studio</strong> แล้วล็อกอินด้วยบัญชี Google</li>
+            <li>กดปุ่ม <strong>Create API key</strong> เพื่อสร้างคีย์ใหม่ (ใช้งานฟรี)</li>
+            <li>คัดลอกรหัสที่ขึ้นต้นด้วย <code class="bg-white/80 px-1 rounded">AIza...</code> มาวางในช่องด้านบนแล้วกด <strong>บันทึกและใช้งาน</strong></li>
+          </ol>
+        </div>
+
+        <!-- Privacy Notice -->
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-start gap-2">
+          <svg class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          <span><strong>ความปลอดภัย:</strong> API Key จะถูกบันทึกไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น (LocalStorage) ไม่มีการส่งไปเก็บที่เซิร์ฟเวอร์อื่น</span>
+        </div>
+      </div>
+
+      <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          onclick="clearApiSettings()"
+          class="px-3.5 py-2 rounded-xl bg-white hover:bg-red-50 text-red-600 border border-red-200 text-xs font-semibold transition cursor-pointer"
+        >
+          ล้าง API Key
+        </button>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            id="testApiBtn"
+            onclick="testApiConnection()"
+            class="px-3.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold transition cursor-pointer"
+          >
+            ทดสอบการเชื่อมต่อ
+          </button>
+          <button
+            type="button"
+            onclick="saveApiSettings()"
+            class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer"
+          >
+            บันทึกและใช้งาน
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION ==================== -->
+  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl bg-slate-800 text-white text-sm font-medium shadow-lg flex items-center gap-2 max-w-md">
+    <svg class="w-5 h-5 text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span id="toastMsg"></span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. CLSI M100-Ed36 (2026) & CLSI M45 (3rd ed.) BREAKPOINT DATABASE
+    // =========================================================================
+    const ORGANISM_DB = [
+      {
+        id: 'enterobacterales',
+        name: 'Enterobacterales (E. coli, K. pneumoniae, K. oxytoca, E. cloacae, P. mirabilis, S. marcescens, C. freundii, M. morganii, Providencia spp., K. aerogenes)',
+        shortName: 'Enterobacterales',
+        aliases: ['e. coli', 'escherichia coli', 'klebsiella pneumoniae', 'k. pneumoniae', 'klebsiella oxytoca', 'k. oxytoca', 'enterobacter cloacae', 'e. cloacae', 'proteus mirabilis', 'p. mirabilis', 'serratia marcescens', 'citrobacter freundii', 'morganella morganii', 'providencia', 'klebsiella aerogenes', 'k. aerogenes', 'cre', 'esbl', 'enterobacteriaceae'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2A-1',
+        mdroType: 'enterobacterales',
+        conditions: 'Disk: MHA, 35°C±2°C, 16-18 h | MIC: CAMHB, 35°C±2°C, 16-20 h (Cefiderocol ใช้ Iron-depleted CAMHB)',
+        intrinsic: 'K. pneumoniae/K. oxytoca ดื้อ Ampicillin; E. cloacae/C. freundii/K. aerogenes ดื้อ Ampicillin, AMC, SAM, Ceph I/II (เสี่ยง AmpC); P. mirabilis/M. morganii/Providencia/S. marcescens ดื้อ Colistin/Polymyxin B',
+        drugs: [
+          { name: 'Ampicillin', abbr: ['AM', 'AMP'], cls: 'Penicillins', disk: { s: 17, i: [14, 16], r: 13, content: '10 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Amoxicillin-clavulanate', abbr: ['AMC', 'AUG'], cls: 'β-Lactam Combinations', disk: { s: 18, i: [14, 17], r: 13, content: '20/10 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Ampicillin-sulbactam', abbr: ['SAM', 'AMS'], cls: 'β-Lactam Combinations', disk: { s: 15, i: [12, 14], r: 11, content: '10/10 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Piperacillin-tazobactam', abbr: ['TZP', 'PTZ'], cls: 'β-Lactam Combinations', disk: { s: 25, sdd: [21, 24], r: 20, content: '100/10 µg' }, mic: { s: 8, sdd: [16, 16], r: 32 } },
+          { name: 'Aztreonam-avibactam (2026)', abbr: ['AZA'], cls: 'β-Lactam Combinations', disk: { s: 25, i: [22, 24], r: 21, content: '30/20 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ceftazidime-avibactam', abbr: ['CZA'], cls: 'β-Lactam Combinations', disk: { s: 21, r: 20, content: '30/20 µg' }, mic: { s: 8, r: 16 } },
+          { name: 'Ceftolozane-tazobactam', abbr: ['C/T', 'CT'], cls: 'β-Lactam Combinations', disk: { s: 22, i: [19, 21], r: 18, content: '30/10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Imipenem-relebactam', abbr: ['IMR'], cls: 'β-Lactam Combinations', disk: { s: 25, i: [21, 24], r: 20, content: '10/25 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Meropenem-vaborbactam', abbr: ['MEV'], cls: 'β-Lactam Combinations', disk: { s: 18, i: [15, 17], r: 14, content: '20/10 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Cefazolin (Systemic)', abbr: ['CZ', 'CFZ'], cls: 'Cephems (1st/2nd Gen)', disk: { s: 23, i: [20, 22], r: 19, content: '30 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Cefazolin (Uncomplicated UTI)', abbr: ['CZ-U'], cls: 'Cephems (1st/2nd Gen)', disk: { s: 15, r: 14, content: '30 µg' }, mic: { s: 16, r: 32 } },
+          { name: 'Cefuroxime (parenteral)', abbr: ['CXM'], cls: 'Cephems (1st/2nd Gen)', disk: { s: 18, i: [15, 17], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefoxitin', abbr: ['FOX'], cls: 'Cephamycins', disk: { s: 18, i: [15, 17], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefotaxime', abbr: ['CTX'], cls: 'Cephems (3rd/4th Gen)', is3rdGenCeph: true, disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftriaxone', abbr: ['CRO', 'CTR'], cls: 'Cephems (3rd/4th Gen)', is3rdGenCeph: true, disk: { s: 23, i: [20, 22], r: 19, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftazidime', abbr: ['CAZ'], cls: 'Cephems (3rd/4th Gen)', is3rdGenCeph: true, disk: { s: 21, i: [18, 20], r: 17, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Cefepime', abbr: ['FEP', 'CPM'], cls: 'Cephems (3rd/4th Gen)', disk: { s: 25, sdd: [19, 24], r: 18, content: '30 µg' }, mic: { s: 2, sdd: [4, 8], r: 16 } },
+          { name: 'Cefiderocol', abbr: ['FDC'], cls: 'Siderophore Cephem', disk: { s: 16, i: [9, 15], r: 8, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Aztreonam', abbr: ['ATM'], cls: 'Monobactams', is3rdGenCeph: true, disk: { s: 21, i: [18, 20], r: 17, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ertapenem', abbr: ['ETP'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 22, i: [19, 21], r: 18, content: '10 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Imipenem', abbr: ['IPM', 'IMI'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Meropenem', abbr: ['MEM', 'MER'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Doripenem', abbr: ['DOR'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Colistin / Polymyxin B', abbr: ['CL', 'COL', 'PB'], cls: 'Polymyxins', disk: null, mic: { s: null, i: [0, 2], r: 4 } },
+          { name: 'Gentamicin', abbr: ['GM', 'GEN', 'CN'], cls: 'Aminoglycosides', disk: { s: 18, i: [15, 17], r: 14, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Tobramycin', abbr: ['TM', 'TOB'], cls: 'Aminoglycosides', disk: { s: 17, i: [13, 16], r: 12, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Amikacin', abbr: ['AN', 'AK', 'AMK'], cls: 'Aminoglycosides', disk: { s: 20, i: [17, 19], r: 16, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Tetracycline', abbr: ['TE', 'TET'], cls: 'Tetracyclines', disk: { s: 15, i: [12, 14], r: 11, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Doxycycline', abbr: ['DO', 'DOX'], cls: 'Tetracyclines', disk: { s: 14, i: [11, 13], r: 10, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Minocycline', abbr: ['MI', 'MIN'], cls: 'Tetracyclines', disk: { s: 16, i: [13, 15], r: 12, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 26, i: [22, 25], r: 21, content: '5 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Levofloxacin', abbr: ['LVX', 'LEV'], cls: 'Fluoroquinolones', disk: { s: 21, i: [17, 20], r: 16, content: '5 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT', 'TMP-SMX'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+          { name: 'Chloramphenicol', abbr: ['C', 'CHL'], cls: 'Phenicols', disk: { s: 18, i: [13, 17], r: 12, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Fosfomycin (Urine E. coli)', abbr: ['FOS'], cls: 'Fosfomycins', disk: { s: 16, i: [13, 15], r: 12, content: '200 µg' }, mic: { s: 64, i: [128, 128], r: 256 } },
+          { name: 'Nitrofurantoin (Urine)', abbr: ['FM', 'NIT'], cls: 'Nitrofurans', disk: { s: 17, i: [15, 16], r: 14, content: '300 µg' }, mic: { s: 32, i: [64, 64], r: 128 } },
+        ]
+      },
+      {
+        id: 'salmonella_shigella',
+        name: 'Salmonella spp. & Shigella spp.',
+        shortName: 'Salmonella / Shigella',
+        aliases: ['salmonella', 'salmonella typhi', 'shigella', 'shigella sonnei', 'shigella flexneri'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2A-2',
+        mdroType: 'enterobacterales',
+        conditions: 'Disk: MHA, 35°C±2°C, 16-18 h | MIC: CAMHB, 35°C±2°C, 16-20 h',
+        intrinsic: 'WARNING: ห้ามรายงานผล S สำหรับ 1st/2nd-gen Cephalosporins, Cephamycins และ Aminoglycosides แม้ผล in vitro จะดูเหมือนไว',
+        drugs: [
+          { name: 'Ampicillin', abbr: ['AM', 'AMP'], cls: 'Penicillins', disk: { s: 17, i: [14, 16], r: 13, content: '10 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefotaxime', abbr: ['CTX'], cls: 'Cephems (3rd Gen)', is3rdGenCeph: true, disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftriaxone', abbr: ['CRO'], cls: 'Cephems (3rd Gen)', is3rdGenCeph: true, disk: { s: 23, i: [20, 22], r: 19, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ertapenem', abbr: ['ETP'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 22, i: [19, 21], r: 18, content: '10 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Azithromycin (S. Typhi)', abbr: ['AZM'], cls: 'Macrolides', disk: { s: 13, r: 12, content: '15 µg' }, mic: { s: 16, r: 32 } },
+          { name: 'Azithromycin (Shigella)', abbr: ['AZM'], cls: 'Macrolides', disk: { s: 16, i: [11, 15], r: 10, content: '15 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Ciprofloxacin (Salmonella)', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 31, i: [21, 30], r: 20, content: '5 µg' }, mic: { s: 0.06, i: [0.12, 0.5], r: 1 } },
+          { name: 'Ciprofloxacin (Shigella)', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 26, i: [22, 25], r: 21, content: '5 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Levofloxacin (Salmonella)', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: null, mic: { s: 0.12, i: [0.25, 1], r: 2 } },
+          { name: 'Levofloxacin (Shigella)', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 21, i: [17, 20], r: 16, content: '5 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Tetracycline', abbr: ['TE', 'TET'], cls: 'Tetracyclines', disk: { s: 15, i: [12, 14], r: 11, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+          { name: 'Chloramphenicol', abbr: ['C', 'CHL'], cls: 'Phenicols', disk: { s: 18, i: [13, 17], r: 12, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+        ]
+      },
+      {
+        id: 'pseudomonas_aeruginosa',
+        name: 'Pseudomonas aeruginosa',
+        shortName: 'P. aeruginosa',
+        aliases: ['pseudomonas', 'p. aeruginosa', 'crpa', 'pa'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2B-1',
+        mdroType: 'crpa',
+        conditions: 'Disk: MHA, 35°C±2°C, 16-18 h | MIC: CAMHB, 35°C±2°C, 16-20 h',
+        intrinsic: 'ดื้อโดยธรรมชาติต่อ Ampicillin, AMC, SAM, Ceftriaxone, Cefotaxime, Ertapenem, Tetracyclines, SXT, Chloramphenicol (Gentamicin ถูกถอดเกณฑ์ออกตั้งแต่ Ed33)',
+        drugs: [
+          { name: 'Piperacillin-tazobactam', abbr: ['TZP', 'PTZ'], cls: 'β-Lactam Combinations', disk: { s: 22, i: [18, 21], r: 17, content: '100/10 µg' }, mic: { s: 16, i: [32, 32], r: 64 } },
+          { name: 'Ceftazidime-avibactam', abbr: ['CZA'], cls: 'β-Lactam Combinations', disk: { s: 21, r: 20, content: '30/20 µg' }, mic: { s: 8, r: 16 } },
+          { name: 'Ceftolozane-tazobactam', abbr: ['C/T', 'CT'], cls: 'β-Lactam Combinations', disk: { s: 21, i: [17, 20], r: 16, content: '30/10 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Imipenem-relebactam', abbr: ['IMR'], cls: 'β-Lactam Combinations', disk: { s: 23, i: [20, 22], r: 19, content: '10/25 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Ceftazidime', abbr: ['CAZ'], cls: 'Cephems', disk: { s: 18, i: [15, 17], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefepime', abbr: ['FEP'], cls: 'Cephems', disk: { s: 18, i: [15, 17], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefiderocol', abbr: ['FDC'], cls: 'Siderophore Cephem', disk: { s: 18, i: [13, 17], r: 12, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Aztreonam', abbr: ['ATM'], cls: 'Monobactams', disk: { s: 22, i: [16, 21], r: 15, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 19, i: [16, 18], r: 15, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 19, i: [16, 18], r: 15, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Doripenem', abbr: ['DOR'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 19, i: [16, 18], r: 15, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Colistin / Polymyxin B', abbr: ['CL', 'COL', 'PB'], cls: 'Polymyxins', disk: null, mic: { s: null, i: [0, 2], r: 4 } },
+          { name: 'Tobramycin', abbr: ['TM', 'TOB'], cls: 'Aminoglycosides', disk: { s: 19, i: [13, 18], r: 12, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Amikacin (Urine)', abbr: ['AN', 'AK', 'AMK'], cls: 'Aminoglycosides', disk: { s: 17, i: [15, 16], r: 14, content: '30 µg' }, mic: { s: 16, i: [32, 32], r: 64 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 25, i: [19, 24], r: 18, content: '5 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 22, i: [15, 21], r: 14, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+        ]
+      },
+      {
+        id: 'acinetobacter',
+        name: 'Acinetobacter spp. (A. baumannii complex)',
+        shortName: 'Acinetobacter spp.',
+        aliases: ['acinetobacter', 'a. baumannii', 'acinetobacter baumannii', 'crab', 'ab'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2B-2',
+        mdroType: 'crab',
+        conditions: 'Disk: MHA, 35°C±2°C, 20-24 h | MIC: CAMHB, 35°C±2°C, 20-24 h (อัปเดต 2026: Amikacin, Gentamicin, Tobramycin)',
+        intrinsic: 'ดื้อโดยธรรมชาติต่อ Ampicillin, Amoxicillin, AMC, Aztreonam, Ertapenem, Fosfomycin (Doxycycline & Tetracycline ถูกถอดเกณฑ์ออกตั้งแต่ Ed35)',
+        drugs: [
+          { name: 'Ampicillin-sulbactam', abbr: ['SAM', 'AMS'], cls: 'β-Lactam Combinations', disk: { s: 22, i: [17, 21], r: 16, content: '10/10 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Piperacillin-tazobactam', abbr: ['TZP', 'PTZ'], cls: 'β-Lactam Combinations', disk: { s: 21, i: [18, 20], r: 17, content: '100/10 µg' }, mic: { s: 16, i: [32, 64], r: 128 } },
+          { name: 'Sulbactam-durlobactam', abbr: ['SUD'], cls: 'β-Lactam Combinations', disk: { s: 17, i: [14, 16], r: 13, content: '10/10 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ceftazidime', abbr: ['CAZ'], cls: 'Cephems', disk: { s: 18, i: [15, 17], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefepime', abbr: ['FEP'], cls: 'Cephems', disk: { s: 18, i: [15, 17], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefotaxime', abbr: ['CTX'], cls: 'Cephems', disk: { s: 23, i: [15, 22], r: 14, content: '30 µg' }, mic: { s: 8, i: [16, 32], r: 64 } },
+          { name: 'Ceftriaxone', abbr: ['CRO'], cls: 'Cephems', disk: { s: 21, i: [14, 20], r: 13, content: '30 µg' }, mic: { s: 8, i: [16, 32], r: 64 } },
+          { name: 'Cefiderocol', abbr: ['FDC'], cls: 'Siderophore Cephem', disk: { s: 15, r: null, content: '30 µg (≤14 ต้องทำ MIC)' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 22, i: [19, 21], r: 18, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 18, i: [15, 17], r: 14, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Doripenem', abbr: ['DOR'], cls: 'Carbapenems', isCarbapenem: true, disk: { s: 18, i: [15, 17], r: 14, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Colistin / Polymyxin B', abbr: ['CL', 'COL', 'PB'], cls: 'Polymyxins', disk: null, mic: { s: null, i: [0, 2], r: 4 } },
+          { name: 'Gentamicin (2026)', abbr: ['GM', 'GEN'], cls: 'Aminoglycosides', disk: { s: 19, i: [14, 18], r: 13, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Tobramycin (2026)', abbr: ['TM', 'TOB'], cls: 'Aminoglycosides', disk: { s: 17, i: [13, 16], r: 12, content: '10 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Amikacin (2026)', abbr: ['AN', 'AK', 'AMK'], cls: 'Aminoglycosides', disk: { s: 20, i: [17, 19], r: 16, content: '30 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Minocycline', abbr: ['MI', 'MIN'], cls: 'Tetracyclines', disk: { s: 22, i: [18, 21], r: 17, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, i: [16, 20], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+        ]
+      },
+      {
+        id: 'stenotrophomonas',
+        name: 'Stenotrophomonas maltophilia',
+        shortName: 'S. maltophilia',
+        aliases: ['stenotrophomonas', 's. maltophilia', 'maltophilia'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2B-4',
+        mdroType: 'other',
+        conditions: 'Disk: MHA, 35°C±2°C, 20-24 h | MIC: CAMHB, 35°C±2°C, 20-24 h (อัปเดต 2026: Cefiderocol Disk ≥17 mm)',
+        intrinsic: 'ดื้อโดยธรรมชาติต่อ Carbapenems ทุกตัว, Aminoglycosides, Tetracycline, Ampicillin, Piperacillin-tazobactam, Aztreonam',
+        drugs: [
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Minocycline', abbr: ['MI', 'MIN'], cls: 'Tetracyclines', disk: { s: 26, i: [21, 25], r: 20, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Cefiderocol (2026)', abbr: ['FDC'], cls: 'Siderophore Cephem', disk: { s: 17, r: null, content: '30 µg' }, mic: { s: 1, r: null } },
+          { name: 'Chloramphenicol', abbr: ['C', 'CHL'], cls: 'Phenicols', disk: null, mic: { s: 8, i: [16, 16], r: 32 } },
+        ]
+      },
+      {
+        id: 'staph_aureus',
+        name: 'Staphylococcus aureus (และ S. lugdunensis)',
+        shortName: 'S. aureus',
+        aliases: ['staph', 'staphylococcus aureus', 's. aureus', 'mrsa', 'mssa', 's. lugdunensis', 'staphylococcus lugdunensis'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2C',
+        mdroType: 'saureus',
+        conditions: 'Disk: MHA, 35°C±2°C, 16-18 h | MIC: CAMHB (+2% NaCl สำหรับ Oxacillin), 16-20 h (24 h สำหรับ Oxacillin & Vancomycin)',
+        intrinsic: 'หากดื้อ (R) ต่อ Cefoxitin หรือ Oxacillin = MRSA (ดื้อต่อ β-lactams ทุกตัว ยกเว้น Ceftaroline) | Vancomycin ต้องใช้ MIC เท่านั้น',
+        drugs: [
+          { name: 'Cefoxitin (Surrogate for Oxacillin)', abbr: ['FOX'], cls: 'Penicillinase-Stable Penicillins', isMrsaMarker: true, disk: { s: 22, r: 21, content: '30 µg' }, mic: { s: 4, r: 8 } },
+          { name: 'Oxacillin', abbr: ['OX', 'OXA'], cls: 'Penicillinase-Stable Penicillins', isMrsaMarker: true, disk: null, mic: { s: 2, r: 4 } },
+          { name: 'Penicillin', abbr: ['P', 'PEN'], cls: 'Penicillins', disk: { s: 29, r: 28, content: '10 units' }, mic: { s: 0.12, r: 0.25 } },
+          { name: 'Ceftaroline', abbr: ['CPT'], cls: 'Anti-MRSA Cephem', disk: { s: 25, sdd: [20, 24], r: 19, content: '30 µg' }, mic: { s: 1, sdd: [2, 4], r: 8 } },
+          { name: 'Vancomycin', abbr: ['VA', 'VAN'], cls: 'Glycopeptides', disk: null, mic: { s: 2, i: [4, 8], r: 16 } },
+          { name: 'Daptomycin', abbr: ['DAP'], cls: 'Lipopeptides', disk: null, mic: { s: 1, r: null } },
+          { name: 'Linezolid', abbr: ['LZD', 'LNZ'], cls: 'Oxazolidinones', disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 4, r: 8 } },
+          { name: 'Gentamicin', abbr: ['GM', 'GEN'], cls: 'Aminoglycosides', disk: { s: 15, i: [13, 14], r: 12, content: '10 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Erythromycin', abbr: ['E', 'ERY'], cls: 'Macrolides', disk: { s: 23, i: [14, 22], r: 13, content: '15 µg' }, mic: { s: 0.5, i: [1, 4], r: 8 } },
+          { name: 'Clindamycin', abbr: ['CM', 'CLI', 'DA'], cls: 'Lincosamides', disk: { s: 21, i: [15, 20], r: 14, content: '2 µg' }, mic: { s: 0.5, i: [1, 2], r: 4 } },
+          { name: 'Tetracycline', abbr: ['TE', 'TET'], cls: 'Tetracyclines', disk: { s: 19, i: [15, 18], r: 14, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Doxycycline', abbr: ['DO', 'DOX'], cls: 'Tetracyclines', disk: { s: 16, i: [13, 15], r: 12, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Minocycline', abbr: ['MI', 'MIN'], cls: 'Tetracyclines', disk: { s: 19, i: [15, 18], r: 14, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, i: [16, 20], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 19, i: [16, 18], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+          { name: 'Rifampin', abbr: ['RA', 'RIF'], cls: 'Ansamycins', disk: { s: 20, i: [17, 19], r: 16, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Nitrofurantoin (Urine)', abbr: ['FM', 'NIT'], cls: 'Nitrofurans', disk: { s: 17, i: [15, 16], r: 14, content: '300 µg' }, mic: { s: 32, i: [64, 64], r: 128 } },
+        ]
+      },
+      {
+        id: 'staph_cons',
+        name: 'Staphylococcus epidermidis & CoNS (SOSA)',
+        shortName: 'S. epidermidis / CoNS',
+        aliases: ['staphylococcus epidermidis', 's. epidermidis', 'cons', 'sosa', 'mrse', 'staphylococcus haemolyticus', 'staphylococcus hominis', 'staphylococcus saprophyticus'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2C',
+        mdroType: 'cons',
+        conditions: 'Disk: MHA, 35°C±2°C, 24 h สำหรับ Cefoxitin | MIC: CAMHB, 24 h สำหรับ Oxacillin & Vancomycin',
+        intrinsic: 'CoNS ที่ดื้อ Oxacillin/Cefoxitin คือ MRSE/MRS ไม่ใช่ MRSA (ระบบจะไม่แสดงป้อบอัพ MRSA)',
+        drugs: [
+          { name: 'Cefoxitin (Surrogate for Oxacillin)', abbr: ['FOX'], cls: 'Penicillinase-Stable Penicillins', disk: { s: 25, r: 24, content: '30 µg' }, mic: null },
+          { name: 'Oxacillin', abbr: ['OX', 'OXA'], cls: 'Penicillinase-Stable Penicillins', disk: { s: 18, r: 17, content: '1 µg (S. epidermidis)' }, mic: { s: 0.5, r: 1 } },
+          { name: 'Penicillin', abbr: ['P', 'PEN'], cls: 'Penicillins', disk: { s: 29, r: 28, content: '10 units' }, mic: { s: 0.12, r: 0.25 } },
+          { name: 'Vancomycin', abbr: ['VA', 'VAN'], cls: 'Glycopeptides', disk: null, mic: { s: 4, i: [8, 16], r: 32 } },
+          { name: 'Daptomycin', abbr: ['DAP'], cls: 'Lipopeptides', disk: null, mic: { s: 1, r: null } },
+          { name: 'Linezolid', abbr: ['LZD'], cls: 'Oxazolidinones', disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 4, r: 8 } },
+          { name: 'Gentamicin', abbr: ['GM'], cls: 'Aminoglycosides', disk: { s: 15, i: [13, 14], r: 12, content: '10 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: { s: 23, i: [14, 22], r: 13, content: '15 µg' }, mic: { s: 0.5, i: [1, 4], r: 8 } },
+          { name: 'Clindamycin', abbr: ['CM', 'CLI'], cls: 'Lincosamides', disk: { s: 21, i: [15, 20], r: 14, content: '2 µg' }, mic: { s: 0.5, i: [1, 2], r: 4 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 19, i: [15, 18], r: 14, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, i: [16, 20], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+        ]
+      },
+      {
+        id: 'enterococcus',
+        name: 'Enterococcus spp. (E. faecalis, E. faecium)',
+        shortName: 'Enterococcus spp.',
+        aliases: ['enterococcus', 'e. faecalis', 'enterococcus faecalis', 'e. faecium', 'enterococcus faecium', 'vre'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2D',
+        mdroType: 'enterococcus',
+        conditions: 'Disk: MHA, 35°C±2°C, 16-18 h (24 h สำหรับ Vancomycin) | MIC: CAMHB, 16-20 h (24 h สำหรับ Vancomycin)',
+        intrinsic: 'WARNING: ดื้อโดยธรรมชาติต่อ Cephalosporins, Clindamycin, SXT และ Aminoglycosides (ยกเว้นทดสอบ High-level synergy)',
+        drugs: [
+          { name: 'Ampicillin', abbr: ['AM', 'AMP'], cls: 'Penicillins', disk: { s: 17, r: 16, content: '10 µg' }, mic: { s: 8, r: 16 } },
+          { name: 'Penicillin', abbr: ['P', 'PEN'], cls: 'Penicillins', disk: { s: 15, r: 14, content: '10 units' }, mic: { s: 8, r: 16 } },
+          { name: 'Vancomycin', abbr: ['VA', 'VAN'], cls: 'Glycopeptides', isVreMarker: true, disk: { s: 17, i: [15, 16], r: 14, content: '30 µg' }, mic: { s: 4, i: [8, 16], r: 32 } },
+          { name: 'Linezolid', abbr: ['LZD'], cls: 'Oxazolidinones', disk: { s: 23, i: [21, 22], r: 20, content: '30 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Daptomycin (E. faecalis / other)', abbr: ['DAP'], cls: 'Lipopeptides', disk: null, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Daptomycin (E. faecium)', abbr: ['DAP'], cls: 'Lipopeptides', disk: null, mic: { s: null, sdd: [0, 4], r: 8 } },
+          { name: 'Ciprofloxacin (Urine)', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, i: [16, 20], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Levofloxacin (Urine)', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Tetracycline (Urine)', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 19, i: [15, 18], r: 14, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Nitrofurantoin (Urine)', abbr: ['FM', 'NIT'], cls: 'Nitrofurans', disk: { s: 17, i: [15, 16], r: 14, content: '300 µg' }, mic: { s: 32, i: [64, 64], r: 128 } },
+          { name: 'Fosfomycin (Urine E. faecalis)', abbr: ['FOS'], cls: 'Fosfomycins', disk: { s: 16, i: [13, 15], r: 12, content: '200 µg' }, mic: { s: 64, i: [128, 128], r: 256 } },
+        ]
+      },
+      {
+        id: 'haemophilus',
+        name: 'Haemophilus influenzae & H. parainfluenzae',
+        shortName: 'H. influenzae',
+        aliases: ['haemophilus', 'h. influenzae', 'haemophilus influenzae', 'h. parainfluenzae'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2E',
+        mdroType: 'other',
+        conditions: 'Disk: HTM หรือ MH-F, 5% CO2, 16-18 h | MIC: HTM หรือ MH-F broth, ambient air, 20-24 h',
+        intrinsic: 'สำหรับเชื้อจาก CSF รายงานเฉพาะ Ampicillin, 3rd-gen Cephalosporins, Chloramphenicol และ Meropenem',
+        drugs: [
+          { name: 'Ampicillin', abbr: ['AM', 'AMP'], cls: 'Penicillins', disk: { s: 22, i: [19, 21], r: 18, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Amoxicillin-clavulanate', abbr: ['AMC'], cls: 'β-Lactam Combinations', disk: null, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Ampicillin-sulbactam', abbr: ['SAM'], cls: 'β-Lactam Combinations', disk: { s: 20, r: 19, content: '10/10 µg' }, mic: { s: 2, r: 4 } },
+          { name: 'Ceftriaxone / Cefotaxime', abbr: ['CRO', 'CTX'], cls: 'Cephems', disk: { s: 26, r: null, content: '30 µg' }, mic: { s: 2, r: null } },
+          { name: 'Cefuroxime', abbr: ['CXM'], cls: 'Cephems', disk: { s: 20, i: [17, 19], r: 16, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: { s: 20, r: null, content: '10 µg' }, mic: { s: 0.5, r: null } },
+          { name: 'Azithromycin', abbr: ['AZM'], cls: 'Macrolides', disk: { s: 12, r: null, content: '15 µg' }, mic: { s: 4, r: null } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, r: null, content: '5 µg' }, mic: { s: 1, r: null } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, r: null, content: '5 µg' }, mic: { s: 2, r: null } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 0.5, i: [1, 2], r: 4 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 29, i: [26, 28], r: 25, content: '30 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+        ]
+      },
+      {
+        id: 'neisseria_gonorrhoeae',
+        name: 'Neisseria gonorrhoeae',
+        shortName: 'N. gonorrhoeae',
+        aliases: ['neisseria gonorrhoeae', 'n. gonorrhoeae', 'gonococcus', 'gc'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2F',
+        mdroType: 'other',
+        conditions: 'GC agar + 1% defined growth supplement, 36°C±1°C, 5% CO2, 20-24 h (อัปเดต 2026: ถอดเกณฑ์ Disk Ceftriaxone & Cefixime ชั่วคราว และเพิ่มเกณฑ์ MIC I/R)',
+        intrinsic: '',
+        drugs: [
+          { name: 'Ceftriaxone (2026)', abbr: ['CRO'], cls: 'Cephems (Parenteral)', disk: null, mic: { s: 0.12, i: [0.25, 0.25], r: 0.5 } },
+          { name: 'Cefixime (2026)', abbr: ['CFM'], cls: 'Cephems (Oral)', disk: null, mic: { s: 0.06, i: [0.12, 0.12], r: 0.25 } },
+          { name: 'Azithromycin', abbr: ['AZM'], cls: 'Macrolides', disk: { s: 30, r: null, content: '15 µg' }, mic: { s: 1, r: null } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 41, i: [28, 40], r: 27, content: '5 µg' }, mic: { s: 0.06, i: [0.12, 0.5], r: 1 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 38, i: [31, 37], r: 30, content: '30 µg' }, mic: { s: 0.25, i: [0.5, 1], r: 2 } },
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: { s: 47, i: [27, 46], r: 26, content: '10 units' }, mic: { s: 0.06, i: [0.12, 1], r: 2 } },
+        ]
+      },
+      {
+        id: 'strep_pneumoniae',
+        name: 'Streptococcus pneumoniae',
+        shortName: 'S. pneumoniae',
+        aliases: ['streptococcus pneumoniae', 's. pneumoniae', 'pneumococcus'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2G',
+        mdroType: 'other',
+        conditions: 'Disk: BMHA (5% sheep blood), 5% CO2, 20-24 h | MIC: CAMHB-LHB, ambient air, 20-24 h',
+        intrinsic: 'Penicillin และ Ceftriaxone/Cefotaxime/Meropenem ต้องใช้ MIC ในการแปลผล',
+        drugs: [
+          { name: 'Penicillin (Nonmeningitis)', abbr: ['P', 'PEN'], cls: 'Penicillins', disk: null, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Penicillin (Meningitis)', abbr: ['P-MEN'], cls: 'Penicillins', disk: null, mic: { s: 0.06, r: 0.12 } },
+          { name: 'Ceftriaxone / Cefotaxime (Nonmeningitis)', abbr: ['CRO', 'CTX'], cls: 'Cephems', disk: null, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftriaxone / Cefotaxime (Meningitis)', abbr: ['CRO-MEN'], cls: 'Cephems', disk: null, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: null, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Vancomycin', abbr: ['VA', 'VAN'], cls: 'Glycopeptides', disk: { s: 17, r: null, content: '30 µg' }, mic: { s: 1, r: null } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: { s: 21, i: [16, 20], r: 15, content: '15 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Clindamycin', abbr: ['CM', 'CLI'], cls: 'Lincosamides', disk: { s: 19, i: [16, 18], r: 15, content: '2 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 28, i: [25, 27], r: 24, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 19, i: [16, 18], r: 15, content: '1.25/23.75 µg' }, mic: { s: 0.5, i: [1, 2], r: 4 } },
+          { name: 'Linezolid', abbr: ['LZD'], cls: 'Oxazolidinones', disk: { s: 21, r: null, content: '30 µg' }, mic: { s: 2, r: null } },
+        ]
+      },
+      {
+        id: 'strep_beta',
+        name: 'Streptococcus spp. β-Hemolytic Group (S. pyogenes, S. agalactiae)',
+        shortName: 'β-Hemolytic Strep',
+        aliases: ['streptococcus pyogenes', 's. pyogenes', 'group a', 'gas', 'streptococcus agalactiae', 's. agalactiae', 'group b', 'gbs', 'beta-hemolytic'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2H-1',
+        mdroType: 'other',
+        conditions: 'Disk: BMHA (5% sheep blood), 5% CO2, 20-24 h | MIC: CAMHB-LHB, ambient air, 20-24 h (อัปเดต 2026: เพิ่ม SXT MIC)',
+        intrinsic: 'หาก Penicillin/Ampicillin เป็น NS ให้ยืนยันเชื้อและผลซ้ำทันที',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: { s: 24, r: null, content: '10 units' }, mic: { s: 0.12, r: null } },
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: { s: 24, r: null, content: '10 µg' }, mic: { s: 0.25, r: null } },
+          { name: 'Ceftriaxone / Cefotaxime', abbr: ['CRO', 'CTX'], cls: 'Cephems', disk: { s: 24, r: null, content: '30 µg' }, mic: { s: 0.5, r: null } },
+          { name: 'Vancomycin', abbr: ['VA'], cls: 'Glycopeptides', disk: { s: 17, r: null, content: '30 µg' }, mic: { s: 1, r: null } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: { s: 21, i: [16, 20], r: 15, content: '15 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Clindamycin', abbr: ['CM', 'CLI'], cls: 'Lincosamides', disk: { s: 19, i: [16, 18], r: 15, content: '2 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 23, i: [19, 22], r: 18, content: '30 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Trimethoprim-sulfamethoxazole (2026)', abbr: ['SXT'], cls: 'Folate Antagonists', disk: null, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Linezolid', abbr: ['LZD'], cls: 'Oxazolidinones', disk: { s: 21, r: null, content: '30 µg' }, mic: { s: 2, r: null } },
+        ]
+      },
+      {
+        id: 'strep_viridans',
+        name: 'Streptococcus spp. Viridans Group',
+        shortName: 'Viridans Strep',
+        aliases: ['viridans', 'streptococcus viridans', 's. mitis', 's. anginosus', 's. salivarius', 's. bovis'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2H-2',
+        mdroType: 'other',
+        conditions: 'Disk: BMHA, 5% CO2, 20-24 h | MIC: CAMHB-LHB, ambient air, 20-24 h',
+        intrinsic: 'Penicillin และ Ampicillin ต้องทดสอบด้วยวิธี MIC เท่านั้น',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: null, mic: { s: 0.12, i: [0.25, 2], r: 4 } },
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: null, mic: { s: 0.25, i: [0.5, 4], r: 8 } },
+          { name: 'Cefepime', abbr: ['FEP'], cls: 'Cephems', disk: { s: 24, i: [22, 23], r: 21, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Cefotaxime', abbr: ['CTX'], cls: 'Cephems', disk: { s: 28, i: [26, 27], r: 25, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftriaxone', abbr: ['CRO'], cls: 'Cephems', disk: { s: 27, i: [25, 26], r: 24, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Vancomycin', abbr: ['VA'], cls: 'Glycopeptides', disk: { s: 17, r: null, content: '30 µg' }, mic: { s: 1, r: null } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: { s: 21, i: [16, 20], r: 15, content: '15 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Clindamycin', abbr: ['CM'], cls: 'Lincosamides', disk: { s: 19, i: [16, 18], r: 15, content: '2 µg' }, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Linezolid', abbr: ['LZD'], cls: 'Oxazolidinones', disk: { s: 21, r: null, content: '30 µg' }, mic: { s: 2, r: null } },
+        ]
+      },
+      {
+        id: 'neisseria_meningitidis',
+        name: 'Neisseria meningitidis',
+        shortName: 'N. meningitidis',
+        aliases: ['neisseria meningitidis', 'n. meningitidis', 'meningococcus'],
+        source: 'CLSI M100-Ed36 (2026)',
+        table: 'Table 2I',
+        mdroType: 'other',
+        conditions: 'BSC precautions! Disk: BMHA, 5% CO2, 20-24 h | MIC: CAMHB-LHB, 5% CO2, 20-24 h',
+        intrinsic: 'ต้องปฏิบัติงานใน Biological Safety Cabinet (BSC) เท่านั้น',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: null, mic: { s: 0.06, i: [0.12, 0.25], r: 0.5 } },
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: null, mic: { s: 0.12, i: [0.25, 1], r: 2 } },
+          { name: 'Ceftriaxone / Cefotaxime', abbr: ['CRO', 'CTX'], cls: 'Cephems', disk: { s: 34, r: null, content: '30 µg' }, mic: { s: 0.12, r: null } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: { s: 30, r: null, content: '10 µg' }, mic: { s: 0.25, r: null } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 35, i: [33, 34], r: 32, content: '5 µg' }, mic: { s: 0.03, i: [0.06, 0.06], r: 0.12 } },
+          { name: 'Rifampin', abbr: ['RA', 'RIF'], cls: 'Ansamycins', disk: { s: 25, i: [20, 24], r: 19, content: '5 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+        ]
+      },
+      // ===================== CLSI M45 (3rd ed.) =====================
+      {
+        id: 'aeromonas',
+        name: 'Aeromonas spp. (A. hydrophila, A. caviae, A. veronii complex)',
+        shortName: 'Aeromonas spp.',
+        aliases: ['aeromonas', 'a. hydrophila', 'a. caviae', 'a. veronii'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 3',
+        mdroType: 'm45',
+        conditions: 'Disk: MHA, 35°C, ambient air, 16-18 h | MIC: CAMHB, 35°C, ambient air, 16-20 h',
+        intrinsic: 'ดื้อโดยธรรมชาติต่อ Ampicillin, Amoxicillin-clavulanate และ Cefazolin',
+        drugs: [
+          { name: 'Piperacillin-tazobactam', abbr: ['TZP'], cls: 'β-Lactam Combinations', disk: { s: 21, i: [18, 20], r: 17, content: '100/10 µg' }, mic: { s: 16, i: [32, 64], r: 128 } },
+          { name: 'Cefepime', abbr: ['FEP'], cls: 'Cephems', disk: { s: 25, i: [19, 24], r: 18, content: '30 µg' }, mic: { s: 2, i: [4, 8], r: 16 } },
+          { name: 'Cefotaxime', abbr: ['CTX'], cls: 'Cephems', disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftriaxone', abbr: ['CRO'], cls: 'Cephems', disk: { s: 23, i: [20, 22], r: 19, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftazidime', abbr: ['CAZ'], cls: 'Cephems', disk: { s: 21, i: [18, 20], r: 17, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ertapenem', abbr: ['ETP'], cls: 'Carbapenems', disk: { s: 22, i: [19, 21], r: 18, content: '10 µg' }, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Amikacin', abbr: ['AN'], cls: 'Aminoglycosides', disk: { s: 17, i: [15, 16], r: 14, content: '30 µg' }, mic: { s: 16, i: [32, 32], r: 64 } },
+          { name: 'Gentamicin', abbr: ['GM'], cls: 'Aminoglycosides', disk: { s: 15, i: [13, 14], r: 12, content: '10 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, i: [16, 20], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Levofloxacin', abbr: ['LVX'], cls: 'Fluoroquinolones', disk: { s: 17, i: [14, 16], r: 13, content: '5 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 15, i: [12, 14], r: 11, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+        ]
+      },
+      {
+        id: 'vibrio',
+        name: 'Vibrio spp. (รวม Vibrio cholerae)',
+        shortName: 'Vibrio spp.',
+        aliases: ['vibrio', 'v. cholerae', 'vibrio cholerae', 'v. vulnificus', 'v. parahaemolyticus'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 20',
+        mdroType: 'm45',
+        conditions: 'เตรียม Inoculum ใน 0.85% NaCl | Disk: MHA, 35°C, 16-18 h | MIC: CAMHB, 35°C, 16-20 h',
+        intrinsic: 'Halophilic Vibrio spp. มักดื้อต่อ Penicillins และ 1st/2nd-gen Cephalosporins',
+        drugs: [
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: { s: 17, i: [14, 16], r: 13, content: '10 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Cefotaxime', abbr: ['CTX'], cls: 'Cephems', disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Ceftazidime', abbr: ['CAZ'], cls: 'Cephems', disk: { s: 21, i: [18, 20], r: 17, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: { s: 23, i: [20, 22], r: 19, content: '10 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Azithromycin', abbr: ['AZM'], cls: 'Macrolides', disk: null, mic: { s: 2, r: null } },
+          { name: 'Doxycycline', abbr: ['DO', 'DOX'], cls: 'Tetracyclines', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 15, i: [12, 14], r: 11, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 21, i: [16, 20], r: 15, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 16, i: [11, 15], r: 10, content: '1.25/23.75 µg' }, mic: { s: 2, r: 4 } },
+        ]
+      },
+      {
+        id: 'campylobacter',
+        name: 'Campylobacter jejuni / coli',
+        shortName: 'C. jejuni/coli',
+        aliases: ['campylobacter', 'c. jejuni', 'c. coli'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 5',
+        mdroType: 'm45',
+        conditions: 'Microaerobic | Disk: BMHA, 42°C, 24 h | MIC: CAMHB-LHB, 36-37°C 48 h หรือ 42°C 24 h',
+        intrinsic: 'ผล Erythromycin ใช้ทำนายผล Azithromycin ได้',
+        drugs: [
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: { s: 16, i: [13, 15], r: 12, content: '15 µg' }, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: { s: 24, i: [21, 23], r: 20, content: '5 µg' }, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 26, i: [23, 25], r: 22, content: '30 µg' }, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Doxycycline', abbr: ['DO'], cls: 'Tetracyclines', disk: null, mic: { s: 2, i: [4, 4], r: 8 } },
+        ]
+      },
+      {
+        id: 'moraxella',
+        name: 'Moraxella catarrhalis',
+        shortName: 'M. catarrhalis',
+        aliases: ['moraxella', 'm. catarrhalis'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 16',
+        mdroType: 'm45',
+        conditions: 'Disk: MHA, 35°C, 5% CO2, 20-24 h | MIC: CAMHB, 35°C, ambient air, 20-24 h',
+        intrinsic: 'ส่วนใหญ่สร้าง β-lactamase ดื้อ Penicillin, Ampicillin, Amoxicillin',
+        drugs: [
+          { name: 'Amoxicillin-clavulanate', abbr: ['AMC'], cls: 'β-Lactam Combinations', disk: { s: 24, r: 23, content: '20/10 µg' }, mic: { s: 4, r: 8 } },
+          { name: 'Cefuroxime (oral)', abbr: ['CXM'], cls: 'Cephems', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Azithromycin', abbr: ['AZM'], cls: 'Macrolides', disk: { s: 26, r: null, content: '15 µg' }, mic: { s: 0.25, r: null } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: { s: 21, r: null, content: '15 µg' }, mic: { s: 2, r: null } },
+          { name: 'Tetracycline', abbr: ['TE'], cls: 'Tetracyclines', disk: { s: 29, i: [25, 28], r: 24, content: '30 µg' }, mic: { s: 2, i: [4, 4], r: 8 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 13, i: [11, 12], r: 10, content: '1.25/23.75 µg' }, mic: { s: 0.5, i: [1, 2], r: 4 } },
+        ]
+      },
+      {
+        id: 'pasteurella',
+        name: 'Pasteurella spp. (P. multocida)',
+        shortName: 'Pasteurella spp.',
+        aliases: ['pasteurella', 'p. multocida'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 17',
+        mdroType: 'm45',
+        conditions: 'Disk: BMHA, 35°C, ambient air, 16-18 h | MIC: CAMHB-LHB, 35°C, 18-24 h',
+        intrinsic: 'มักดื้อต่อ Oxacillin, Cephalexin, Erythromycin และ Clindamycin',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: { s: 25, r: null, content: '10 units' }, mic: { s: 0.5, r: null } },
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: { s: 27, r: null, content: '10 µg' }, mic: { s: 0.5, r: null } },
+          { name: 'Amoxicillin-clavulanate', abbr: ['AMC'], cls: 'β-Lactam Combinations', disk: { s: 27, r: null, content: '20/10 µg' }, mic: { s: 0.5, r: null } },
+          { name: 'Ceftriaxone', abbr: ['CRO'], cls: 'Cephems', disk: { s: 34, r: null, content: '30 µg' }, mic: { s: 0.12, r: null } },
+          { name: 'Doxycycline', abbr: ['DO'], cls: 'Tetracyclines', disk: { s: 23, r: null, content: '30 µg' }, mic: { s: 0.5, r: null } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: { s: 24, r: null, content: '1.25/23.75 µg' }, mic: { s: 0.5, r: null } },
+        ]
+      },
+      {
+        id: 'corynebacterium',
+        name: 'Corynebacterium spp. (รวม C. striatum, C. diphtheriae)',
+        shortName: 'Corynebacterium spp.',
+        aliases: ['corynebacterium', 'c. striatum', 'c. jeikeium', 'c. diphtheriae'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 6',
+        mdroType: 'm45',
+        conditions: 'MIC only: CAMHB-LHB, 35°C, ambient air, 24-48 h',
+        intrinsic: '',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: null, mic: { s: 0.12, i: [0.25, 2], r: 4 } },
+          { name: 'Ceftriaxone / Cefotaxime', abbr: ['CRO', 'CTX'], cls: 'Cephems', disk: null, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: null, mic: { s: 0.25, i: [0.5, 0.5], r: 1 } },
+          { name: 'Vancomycin', abbr: ['VA'], cls: 'Glycopeptides', disk: null, mic: { s: 2, r: null } },
+          { name: 'Daptomycin', abbr: ['DAP'], cls: 'Lipopeptides', disk: null, mic: { s: 1, r: null } },
+          { name: 'Linezolid', abbr: ['LZD'], cls: 'Oxazolidinones', disk: null, mic: { s: 2, r: null } },
+          { name: 'Gentamicin', abbr: ['GM'], cls: 'Aminoglycosides', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: null, mic: { s: 0.5, i: [1, 1], r: 2 } },
+          { name: 'Clindamycin', abbr: ['CM'], cls: 'Lincosamides', disk: null, mic: { s: 0.5, i: [1, 2], r: 4 } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: null, mic: { s: 1, i: [2, 2], r: 4 } },
+        ]
+      },
+      {
+        id: 'bacillus',
+        name: 'Bacillus spp. (ไม่ใช่ B. anthracis)',
+        shortName: 'Bacillus spp.',
+        aliases: ['bacillus', 'b. cereus'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 4',
+        mdroType: 'm45',
+        conditions: 'MIC only: CAMHB, 35°C, ambient air, 16-20 h',
+        intrinsic: 'B. cereus มักสร้าง β-lactamase ดื้อต่อ Penicillins และ Cephalosporins',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: null, mic: { s: 0.12, r: 0.25 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Vancomycin', abbr: ['VA'], cls: 'Glycopeptides', disk: null, mic: { s: 4, r: null } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: null, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Clindamycin', abbr: ['CM'], cls: 'Lincosamides', disk: null, mic: { s: 0.5, i: [1, 2], r: 4 } },
+        ]
+      },
+      {
+        id: 'listeria',
+        name: 'Listeria monocytogenes',
+        shortName: 'L. monocytogenes',
+        aliases: ['listeria', 'l. monocytogenes'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 14',
+        mdroType: 'm45',
+        conditions: 'MIC only: CAMHB-LHB, 35°C, ambient air, 20-24 h',
+        intrinsic: 'ดื้อโดยธรรมชาติต่อ Cephalosporins ทุกตัว',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: null, mic: { s: 2, r: null } },
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: null, mic: { s: 2, r: null } },
+          { name: 'Meropenem', abbr: ['MEM'], cls: 'Carbapenems', disk: null, mic: { s: 0.25, r: null } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: null, mic: { s: 0.5, r: null } },
+        ]
+      },
+      {
+        id: 'micrococcus',
+        name: 'Micrococcus spp.',
+        shortName: 'Micrococcus spp.',
+        aliases: ['micrococcus', 'm. luteus'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 15',
+        mdroType: 'm45',
+        conditions: 'MIC only: CAMHB, 35°C, ambient air, 20-24 h',
+        intrinsic: '',
+        drugs: [
+          { name: 'Penicillin', abbr: ['P'], cls: 'Penicillins', disk: null, mic: { s: 0.12, r: 0.25 } },
+          { name: 'Vancomycin', abbr: ['VA'], cls: 'Glycopeptides', disk: null, mic: { s: 2, r: null } },
+          { name: 'Erythromycin', abbr: ['E'], cls: 'Macrolides', disk: null, mic: { s: 0.5, i: [1, 4], r: 8 } },
+          { name: 'Clindamycin', abbr: ['CM'], cls: 'Lincosamides', disk: null, mic: { s: 0.5, i: [1, 2], r: 4 } },
+        ]
+      },
+      {
+        id: 'hacek',
+        name: 'HACEK Group (Aggregatibacter, Cardiobacterium, Eikenella, Kingella)',
+        shortName: 'HACEK Group',
+        aliases: ['hacek', 'aggregatibacter', 'cardiobacterium', 'eikenella', 'kingella'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 9',
+        mdroType: 'm45',
+        conditions: 'MIC only: CAMHB-LHB (หรือ HTM / Brucella broth), 35°C, 5% CO2, 24-48 h',
+        intrinsic: '',
+        drugs: [
+          { name: 'Ampicillin', abbr: ['AM'], cls: 'Penicillins', disk: null, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Amoxicillin-clavulanate', abbr: ['AMC'], cls: 'β-Lactam Combinations', disk: null, mic: { s: 4, r: 8 } },
+          { name: 'Ceftriaxone / Cefotaxime', abbr: ['CRO', 'CTX'], cls: 'Cephems', disk: null, mic: { s: 2, r: null } },
+          { name: 'Ciprofloxacin', abbr: ['CIP'], cls: 'Fluoroquinolones', disk: null, mic: { s: 1, i: [2, 2], r: 4 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: null, mic: { s: 0.5, i: [1, 2], r: 4 } },
+        ]
+      },
+      {
+        id: 'burkholderia_pseudomallei',
+        name: 'Burkholderia pseudomallei',
+        shortName: 'B. pseudomallei',
+        aliases: ['burkholderia pseudomallei', 'b. pseudomallei', 'melioidosis'],
+        source: 'CLSI M45 (3rd ed.)',
+        table: 'Table 21',
+        mdroType: 'm45',
+        conditions: 'MIC only: CAMHB, 35°C±2°C, ambient air, 16-20 h (BSL-2/BSL-3)',
+        intrinsic: 'ดื้อโดยธรรมชาติต่อ Aminoglycosides, Colistin/Polymyxins, Penicillin, Ampicillin, 1st/2nd-gen Cephalosporins',
+        drugs: [
+          { name: 'Amoxicillin-clavulanate', abbr: ['AMC'], cls: 'β-Lactam Combinations', disk: null, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Ceftazidime', abbr: ['CAZ'], cls: 'Cephems', disk: null, mic: { s: 8, i: [16, 16], r: 32 } },
+          { name: 'Imipenem', abbr: ['IPM'], cls: 'Carbapenems', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Doxycycline', abbr: ['DO'], cls: 'Tetracyclines', disk: null, mic: { s: 4, i: [8, 8], r: 16 } },
+          { name: 'Trimethoprim-sulfamethoxazole', abbr: ['SXT'], cls: 'Folate Antagonists', disk: null, mic: { s: 2, r: 4 } },
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 2. APPLICATION STATE
+    // =========================================================================
+    let selectedOrganism = null;
+    let drugInputs = {}; // { [drugName]: { disk: '', mic: '' } }
+    let customDrugs = [];
+    let lastAlertedMdroSignature = '';
+    let currentMdroAlerts = [];
+    let currentMdroModalGroups = [];
+
+    // Photo Audit State (Multi-Organism)
+    let uploadedImageBase64 = null;
+    let uploadedImageMime = null;
+    let imageZoom = 1;
+    let imageRotation = 0;
+    let auditIsolates = [];
+    let auditIsolateSeq = 1;
+
+    // =========================================================================
+    // 3. INTERPRETATION ENGINE (DISK & MIC)
+    // =========================================================================
+    function parseMicValue(raw) {
+      if (raw === null || raw === undefined) return null;
+      const str = String(raw).trim().replace(/≤/g, '<=').replace(/≥/g, '>=');
+      if (!str) return null;
+      const match = str.match(/^(<=|>=|<|>|=)?\s*(\d+(?:\.\d+)?)(?:\s*\/\s*\d+(?:\.\d+)?)?$/);
+      if (!match) return null;
+      const op = match[1] || '=';
+      const num = parseFloat(match[2]);
+      if (isNaN(num)) return null;
+      return { op, num };
+    }
+
+    function interpretDisk(raw, bp) {
+      if (!bp || raw === null || raw === undefined || String(raw).trim() === '') return null;
+      const val = parseFloat(String(raw).trim());
+      if (isNaN(val)) return null;
+
+      if (bp.s !== null && bp.s !== undefined && val >= bp.s) return 'S';
+      if (bp.sdd && val >= bp.sdd[0] && val <= bp.sdd[1]) return 'SDD';
+      if (bp.i && val >= bp.i[0] && val <= bp.i[1]) return 'I';
+      if (bp.r !== null && bp.r !== undefined && val <= bp.r) return 'R';
+
+      // Susceptible-only breakpoint
+      if ((bp.r === null || bp.r === undefined) && !bp.i && !bp.sdd && bp.s !== null && bp.s !== undefined && val < bp.s) {
+        return 'NS';
+      }
+      return null;
+    }
+
+    function interpretMIC(raw, bp) {
+      if (!bp) return null;
+      const parsed = parseMicValue(raw);
+      if (!parsed) return null;
+      const { op, num } = parsed;
+
+      // Handle strict '>' operator (e.g. >4 means greater than 4)
+      let eff = num;
+      if (op === '>') eff = num * 1.0001;
+      if (op === '<') eff = num * 0.9999;
+
+      if (bp.s !== null && bp.s !== undefined && eff <= bp.s) return 'S';
+      if (bp.sdd && eff >= bp.sdd[0] && eff <= bp.sdd[1]) return 'SDD';
+      if (bp.i && eff >= bp.i[0] && eff <= bp.i[1]) return 'I';
+      if (bp.r !== null && bp.r !== undefined && eff >= bp.r) return 'R';
+
+      // Susceptible-only breakpoint
+      if ((bp.r === null || bp.r === undefined) && !bp.i && !bp.sdd && bp.s !== null && bp.s !== undefined && eff > bp.s) {
+        return 'NS';
+      }
+      return null;
+    }
+
+    function evaluateDrug(drug, inp) {
+      if (!inp) return { diskRes: null, micRes: null, finalRes: null, discordant: false };
+      const diskRes = interpretDisk(inp.disk, drug.disk);
+      const micRes = interpretMIC(inp.mic, drug.mic);
+      const discordant = Boolean(diskRes && micRes && diskRes !== micRes);
+      const finalRes = micRes || diskRes || null;
+      return { diskRes, micRes, finalRes, discordant };
+    }
+
+    function formatBreakpointsText(drug) {
+      const parts = [];
+      if (drug.disk) {
+        const d = drug.disk;
+        const segs = [];
+        if (d.s !== null && d.s !== undefined) segs.push(`S≥${d.s}`);
+        if (d.sdd) segs.push(`SDD ${d.sdd[0]}-${d.sdd[1]}`);
+        if (d.i) segs.push(`I ${d.i[0]}-${d.i[1]}`);
+        if (d.r !== null && d.r !== undefined) segs.push(`R≤${d.r}`);
+        parts.push(`Disk${d.content ? ' (' + d.content + ')' : ''}: ${segs.join(', ')}`);
+      } else {
+        parts.push('Disk: ไม่มีเกณฑ์');
+      }
+      if (drug.mic) {
+        const m = drug.mic;
+        const segs = [];
+        if (m.s !== null && m.s !== undefined) segs.push(`S≤${m.s}`);
+        if (m.sdd) segs.push(m.sdd[0] === 0 ? `SDD≤${m.sdd[1]}` : `SDD ${m.sdd[0]}-${m.sdd[1]}`);
+        if (m.i) segs.push(m.i[0] === 0 ? `I≤${m.i[1]}` : (m.i[0] === m.i[1] ? `I=${m.i[0]}` : `I ${m.i[0]}-${m.i[1]}`));
+        if (m.r !== null && m.r !== undefined) segs.push(`R≥${m.r}`);
+        parts.push(`MIC: ${segs.join(', ')}`);
+      } else {
+        parts.push('MIC: ไม่มีเกณฑ์');
+      }
+      return parts.join(' | ');
+    }
+
+    // =========================================================================
+    // 4. MDRO DETECTION ENGINE (STRICTLY 8 GROUPS, ONLY 'R' COUNTS!)
+    // =========================================================================
+    function detectMdroForDataset(org, inputsMap) {
+      if (!org) return [];
+
+      const alerts = [];
+      const testedByClass = {};
+      let totalTestedDrugs = 0;
+      let totalRDrugs = 0;
+
+      const carbapenemR = [];
+      const ceph3R = [];
+      const mrsaR = [];
+      const vreR = [];
+
+      org.drugs.forEach(drug => {
+        const { finalRes } = evaluateDrug(drug, inputsMap[drug.name]);
+        if (!finalRes) return;
+
+        totalTestedDrugs++;
+        if (!testedByClass[drug.cls]) {
+          testedByClass[drug.cls] = { total: 0, rCount: 0 };
+        }
+        testedByClass[drug.cls].total++;
+
+        // STRICT RULE: ONLY 'R' counts as resistant! 'I' and 'SDD' are NEVER counted.
+        if (finalRes === 'R') {
+          totalRDrugs++;
+          testedByClass[drug.cls].rCount++;
+          if (drug.isCarbapenem) carbapenemR.push(drug.name);
+          if (drug.is3rdGenCeph) ceph3R.push(drug.name);
+          if (drug.isMrsaMarker) mrsaR.push(drug.name);
+          if (drug.isVreMarker) vreR.push(drug.name);
+        }
+      });
+
+      const mdroType = org.mdroType;
+
+      // 1. MRSA
+      if (mdroType === 'saureus' && mrsaR.length > 0) {
+        alerts.push({ code: 'MRSA', title: 'MRSA (Methicillin-Resistant S. aureus)', reason: `พบผล R ต่อ ${mrsaR.join(', ')}` });
+      }
+      // 2. VRE
+      if (mdroType === 'enterococcus' && vreR.length > 0) {
+        alerts.push({ code: 'VRE', title: 'VRE (Vancomycin-Resistant Enterococci)', reason: `พบผล R ต่อ ${vreR.join(', ')}` });
+      }
+      // 3. CRE (Enterobacterales)
+      if (mdroType === 'enterobacterales' && carbapenemR.length > 0) {
+        alerts.push({ code: 'CRE', title: 'CRE (Carbapenem-Resistant Enterobacterales)', reason: `พบผล R ต่อ Carbapenem (${carbapenemR.join(', ')})` });
+      }
+      // 4. CRAB
+      if (mdroType === 'crab' && carbapenemR.length > 0) {
+        alerts.push({ code: 'CRAB', title: 'CRAB (Carbapenem-Resistant Acinetobacter baumannii)', reason: `พบผล R ต่อ Carbapenem (${carbapenemR.join(', ')})` });
+      }
+      // 5. CRPA
+      if (mdroType === 'crpa' && carbapenemR.length > 0) {
+        alerts.push({ code: 'CRPA', title: 'CRPA (Carbapenem-Resistant Pseudomonas aeruginosa)', reason: `พบผล R ต่อ Carbapenem (${carbapenemR.join(', ')})` });
+      }
+      // 6. ESBL (Enterobacterales resistant to 3rd-gen cephalosporin / Aztreonam)
+      if (mdroType === 'enterobacterales' && ceph3R.length > 0) {
+        alerts.push({ code: 'ESBL', title: 'ESBL (Extended-Spectrum β-Lactamase Suspected)', reason: `พบผล R ต่อ 3rd-gen Cephalosporin/Aztreonam (${ceph3R.join(', ')})` });
+      }
+      // 7 & 8. PDR & XDR (Only if >= 3 drug classes tested)
+      const testedClasses = Object.keys(testedByClass);
+      const numTestedClasses = testedClasses.length;
+      const resistantClasses = testedClasses.filter(c => testedByClass[c].rCount > 0);
+      const nonResistantClasses = numTestedClasses - resistantClasses.length;
+
+      if (numTestedClasses >= 3 && totalTestedDrugs > 0 && totalRDrugs === totalTestedDrugs) {
+        alerts.push({ code: 'PDR', title: 'PDR (Pandrug-Resistant)', reason: `ดื้อ (R) ต่อยาทุกตัวในทุกกลุ่มยาที่ทดสอบ (${totalRDrugs}/${totalTestedDrugs} ตัว จาก ${numTestedClasses} กลุ่มยา)` });
+      } else if (numTestedClasses >= 3 && nonResistantClasses <= 2) {
+        alerts.push({ code: 'XDR', title: 'XDR (Extensively Drug-Resistant)', reason: `ดื้อ (R) ใน ${resistantClasses.length}/${numTestedClasses} กลุ่มยาที่ทดสอบ (เหลือกลุ่มยาที่ยังไม่ดื้อ ≤ 2 กลุ่ม)` });
+      }
+
+      return alerts;
+    }
+
+    function evaluateMDRO(forcePopup = false) {
+      if (!selectedOrganism) {
+        currentMdroAlerts = [];
+        currentMdroModalGroups = [];
+        updateMdroUI(false);
+        return;
+      }
+      const alerts = detectMdroForDataset(selectedOrganism, drugInputs);
+      currentMdroAlerts = alerts;
+      currentMdroModalGroups = alerts.length > 0 ? [{ orgLabel: selectedOrganism.name, alerts }] : [];
+      const signature = selectedOrganism.id + ':' + alerts.map(a => a.code).sort().join(',');
+      const shouldPopup = alerts.length > 0 && (forcePopup || signature !== lastAlertedMdroSignature);
+      if (alerts.length === 0) lastAlertedMdroSignature = '';
+      else if (shouldPopup) lastAlertedMdroSignature = signature;
+
+      updateMdroUI(shouldPopup);
+    }
+
+    function updateMdroUI(triggerModal) {
+      const banner = document.getElementById('mdroBanner');
+      const badgesEl = document.getElementById('mdroBannerBadges');
+      const reasonEl = document.getElementById('mdroBannerReason');
+
+      if (!currentMdroModalGroups || currentMdroModalGroups.length === 0) {
+        banner.classList.add('hidden');
+        return;
+      }
+      banner.classList.remove('hidden');
+
+      const allCodes = [];
+      const reasons = [];
+      currentMdroModalGroups.forEach(g => {
+        g.alerts.forEach(a => {
+          if (!allCodes.includes(a.code)) allCodes.push(a.code);
+          reasons.push(`${g.orgLabel} → ${a.code}: ${a.reason}`);
+        });
+      });
+
+      badgesEl.innerHTML = allCodes.map(code =>
+        `<span class="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-xs font-bold shadow-sm">${escapeHtml(code)}</span>`
+      ).join('');
+      reasonEl.textContent = reasons.join(' | ');
+
+      if (triggerModal) openMdroModal();
+    }
+
+    function openMdroModal() {
+      if (!currentMdroModalGroups || currentMdroModalGroups.length === 0) return;
+
+      const orgNames = currentMdroModalGroups.map(g => g.orgLabel).join(' / ');
+      document.getElementById('modalOrgName').textContent = orgNames;
+
+      document.getElementById('modalMdroList').innerHTML = currentMdroModalGroups.map(group => `
+        <div class="rounded-xl border border-red-200 bg-red-50/70 p-3 space-y-2">
+          <div class="text-xs font-bold text-slate-800 border-b border-red-200/70 pb-1">
+            ${escapeHtml(group.orgLabel)}
+          </div>
+          ${group.alerts.map(a => `
+            <div class="p-2.5 rounded-lg bg-white border border-red-200">
+              <div class="font-bold text-red-700 text-sm">${escapeHtml(a.title)}</div>
+              <div class="text-xs text-red-600 mt-0.5">${escapeHtml(a.reason)}</div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+
+      document.getElementById('mdroModal').classList.remove('hidden');
+    }
+
+    function closeMdroModal() {
+      document.getElementById('mdroModal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // 5. TAB NAVIGATION (EXPOSED ON WINDOW + DOMContentLoaded BINDING)
+    // =========================================================================
+    window.switchTab = function(tab) {
+      const manualSec = document.getElementById('sectionManual');
+      const photoSec = document.getElementById('sectionPhoto');
+      const btnManual = document.getElementById('tabBtnManual');
+      const btnPhoto = document.getElementById('tabBtnPhoto');
+
+      if (!manualSec || !photoSec || !btnManual || !btnPhoto) return;
+
+      if (tab === 'manual') {
+        manualSec.classList.remove('hidden');
+        photoSec.classList.add('hidden');
+        btnManual.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-sky-700 shadow-sm flex items-center justify-center gap-2 cursor-pointer';
+        btnPhoto.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center gap-2 cursor-pointer';
+      } else {
+        manualSec.classList.add('hidden');
+        photoSec.classList.remove('hidden');
+        btnPhoto.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-white text-sky-700 shadow-sm flex items-center justify-center gap-2 cursor-pointer';
+        btnManual.className = 'flex-1 sm:flex-none px-4 py-2 rounded-lg text-sm font-semibold transition-all text-slate-600 hover:text-slate-800 flex items-center justify-center gap-2 cursor-pointer';
+      }
+    };
+
+    // =========================================================================
+    // 6. ORGANISM AUTOCOMPLETE & MAIN DRUG TABLE
+    // =========================================================================
+    function clearOrganismSearch() {
+      const input = document.getElementById('organismSearch');
+      input.value = '';
+      document.getElementById('clearOrgBtn').classList.add('hidden');
+      renderOrganismDropdown('');
+      input.focus();
+    }
+
+    function renderOrganismDropdown(query) {
+      const orgDropdown = document.getElementById('organismDropdown');
+      const q = (query || '').toLowerCase().trim();
+      const matches = ORGANISM_DB.filter(org => {
+        if (!q) return true;
+        return org.name.toLowerCase().includes(q) ||
+               org.shortName.toLowerCase().includes(q) ||
+               org.aliases.some(a => a.includes(q));
+      });
+
+      if (matches.length === 0) {
+        orgDropdown.innerHTML = `<div class="p-4 text-xs text-slate-500 text-center">ไม่พบชื่อเชื้อที่ตรงกับ "${escapeHtml(query)}"</div>`;
+      } else {
+        orgDropdown.innerHTML = matches.map(org => {
+          const isM100 = org.source.includes('M100');
+          const badgeCls = isM100 ? 'bg-sky-100 text-sky-800' : 'bg-indigo-100 text-indigo-800';
+          return `
+            <button type="button" onclick="selectOrganism('${org.id}')" class="w-full text-left px-4 py-2.5 hover:bg-sky-50 transition flex items-center justify-between gap-2 cursor-pointer">
+              <div>
+                <div class="text-sm font-semibold text-slate-800">${escapeHtml(org.shortName)}</div>
+                <div class="text-xs text-slate-500 line-clamp-1">${escapeHtml(org.name)}</div>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold shrink-0 ${badgeCls}">${escapeHtml(org.source)}</span>
+            </button>
+          `;
+        }).join('');
+      }
+      orgDropdown.classList.remove('hidden');
+    }
+
+    function selectOrganism(orgId) {
+      const org = ORGANISM_DB.find(o => o.id === orgId);
+      if (!org) return;
+      selectedOrganism = org;
+      drugInputs = {};
+      customDrugs = [];
+      lastAlertedMdroSignature = '';
+
+      document.getElementById('organismSearch').value = org.shortName;
+      document.getElementById('clearOrgBtn').classList.remove('hidden');
+      document.getElementById('organismDropdown').classList.add('hidden');
+
+      document.getElementById('organismInfoCard').classList.remove('hidden');
+      document.getElementById('orgTitle').textContent = org.name;
+      const srcBadge = document.getElementById('orgSourceBadge');
+      srcBadge.textContent = org.source;
+      srcBadge.className = org.source.includes('M100')
+        ? 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-800'
+        : 'px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800';
+      document.getElementById('orgTableBadge').textContent = org.table;
+      document.getElementById('orgConditions').textContent = org.conditions;
+
+      const intrBox = document.getElementById('orgIntrinsicBox');
+      if (org.intrinsic) {
+        document.getElementById('orgIntrinsicText').textContent = org.intrinsic;
+        intrBox.classList.remove('hidden');
+      } else {
+        intrBox.classList.add('hidden');
+      }
+
+      document.getElementById('emptyState').classList.add('hidden');
+      document.getElementById('tableWrapper').classList.remove('hidden');
+
+      renderDrugTable();
+      updateStatsAndMDRO(false);
+    }
+
+    function renderDrugTable() {
+      if (!selectedOrganism) return;
+      const filterQ = (document.getElementById('drugFilterInput').value || '').toLowerCase().trim();
+      const onlyFilled = document.getElementById('onlyFilledToggle').checked;
+      const allDrugs = [...selectedOrganism.drugs, ...customDrugs];
+
+      const rows = allDrugs.filter(d => {
+        if (onlyFilled) {
+          const inp = drugInputs[d.name];
+          if (!inp || (!inp.disk && !inp.mic)) return false;
+        }
+        if (!filterQ) return true;
+        return d.name.toLowerCase().includes(filterQ) ||
+               d.cls.toLowerCase().includes(filterQ) ||
+               (d.abbr || []).some(a => a.toLowerCase().includes(filterQ));
+      });
+
+      const tbody = document.getElementById('drugTableBody');
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-sm">ไม่พบรายการยาตามเงื่อนไขที่ค้นหา</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map(drug => {
+        const inp = drugInputs[drug.name] || { disk: '', mic: '' };
+        const { finalRes, discordant } = evaluateDrug(drug, inp);
+        const safeName = escapeJs(drug.name);
+
+        const badgeHtml = finalRes
+          ? `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold badge-${finalRes}">${finalRes}</span>`
+          : `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium badge-NONE">-</span>`;
+
+        const discordHtml = discordant
+          ? `<div class="text-[10px] font-bold text-red-600 mt-1">⚠ Disk ≠ MIC</div>`
+          : '';
+
+        return `
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="py-3 px-4">
+              <div class="font-semibold text-slate-800">${escapeHtml(drug.name)}</div>
+              <div class="text-[11px] text-slate-400">${escapeHtml(drug.cls)} ${drug.abbr && drug.abbr.length ? '• ' + drug.abbr.join('/') : ''}</div>
+            </td>
+            <td class="py-3 px-3">
+              <input
+                type="number"
+                step="1"
+                value="${escapeAttr(inp.disk)}"
+                placeholder="${drug.disk ? 'mm' : 'ไม่มีเกณฑ์'}"
+                ${drug.disk || drug.isCustom ? '' : 'disabled'}
+                oninput="onMainDrugInput('${safeName}', 'disk', this.value)"
+                class="w-full px-2.5 py-1.5 rounded-lg border ${drug.disk || drug.isCustom ? 'border-slate-300 bg-white focus:ring-2 focus:ring-sky-500' : 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'} text-sm"
+              />
+            </td>
+            <td class="py-3 px-3">
+              <input
+                type="text"
+                value="${escapeAttr(inp.mic)}"
+                placeholder="${drug.mic ? 'เช่น <=0.5, 4' : 'ไม่มีเกณฑ์'}"
+                ${drug.mic || drug.isCustom ? '' : 'disabled'}
+                oninput="onMainDrugInput('${safeName}', 'mic', this.value)"
+                class="w-full px-2.5 py-1.5 rounded-lg border ${drug.mic || drug.isCustom ? 'border-slate-300 bg-white focus:ring-2 focus:ring-sky-500' : 'border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed'} text-sm"
+              />
+            </td>
+            <td class="py-3 px-3 text-center">
+              ${badgeHtml}
+              ${discordHtml}
+            </td>
+            <td class="py-3 px-4 text-xs text-slate-500">
+              ${drug.isCustom ? 'ยาที่เพิ่มเอง (ไม่มีเกณฑ์ CLSI)' : escapeHtml(formatBreakpointsText(drug))}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function onMainDrugInput(drugName, field, value) {
+      if (!drugInputs[drugName]) drugInputs[drugName] = { disk: '', mic: '' };
+      drugInputs[drugName][field] = value;
+
+      const allDrugs = [...selectedOrganism.drugs, ...customDrugs];
+      const drug = allDrugs.find(d => d.name === drugName);
+      if (drug) {
+        updateStatsAndMDRO(false);
+        const activeEl = document.activeElement;
+        if (activeEl && activeEl.closest('tr')) {
+          const row = activeEl.closest('tr');
+          const resCell = row.cells[3];
+          const { finalRes, discordant } = evaluateDrug(drug, drugInputs[drugName]);
+          resCell.innerHTML = (finalRes
+            ? `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold badge-${finalRes}">${finalRes}</span>`
+            : `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium badge-NONE">-</span>`)
+            + (discordant ? `<div class="text-[10px] font-bold text-red-600 mt-1">⚠ Disk ≠ MIC</div>` : '');
+        }
+      }
+    }
+
+    function updateStatsAndMDRO(forcePopup = false) {
+      if (!selectedOrganism) return;
+      let entered = 0, s = 0, sdd = 0, i = 0, r = 0;
+      selectedOrganism.drugs.forEach(drug => {
+        const { finalRes } = evaluateDrug(drug, drugInputs[drug.name]);
+        if (finalRes) {
+          entered++;
+          if (finalRes === 'S') s++;
+          else if (finalRes === 'SDD') sdd++;
+          else if (finalRes === 'I') i++;
+          else if (finalRes === 'R') r++;
+        }
+      });
+      document.getElementById('statEntered').textContent = entered;
+      document.getElementById('statS').textContent = s;
+      document.getElementById('statSDD').textContent = sdd;
+      document.getElementById('statI').textContent = i;
+      document.getElementById('statR').textContent = r;
+
+      evaluateMDRO(forcePopup);
+    }
+
+    function recalculateMainTable() {
+      if (!selectedOrganism) {
+        showToast('กรุณาเลือกชื่อเชื้อก่อนคำนวณผลลัพธ์');
+        return;
+      }
+      renderDrugTable();
+      updateStatsAndMDRO(true);
+      showToast('คำนวณผลลัพธ์และตรวจสอบเกณฑ์เชื้อดื้อยาใหม่เรียบร้อยแล้ว');
+    }
+
+    function openCustomDrugModal() {
+      if (!selectedOrganism) {
+        showToast('กรุณาเลือกชื่อเชื้อก่อนเพิ่มรายการยา');
+        return;
+      }
+      document.getElementById('customDrugName').value = '';
+      document.getElementById('customDrugClass').value = '';
+      document.getElementById('customDrugModal').classList.remove('hidden');
+    }
+    function closeCustomDrugModal() {
+      document.getElementById('customDrugModal').classList.add('hidden');
+    }
+    function saveCustomDrug() {
+      const name = document.getElementById('customDrugName').value.trim();
+      const cls = document.getElementById('customDrugClass').value.trim() || 'Other';
+      if (!name) {
+        showToast('กรุณากรอกชื่อยาต้านจุลชีพ');
+        return;
+      }
+      customDrugs.push({ name, abbr: [], cls, disk: null, mic: null, isCustom: true });
+      closeCustomDrugModal();
+      renderDrugTable();
+      showToast(`เพิ่มรายการยา "${name}" เรียบร้อยแล้ว`);
+    }
+
+    // =========================================================================
+    // 7. DEMO CASES, CLEAR & COPY REPORT
+    // =========================================================================
+    function toggleDemoMenu() {
+      document.getElementById('demoMenu').classList.toggle('hidden');
+    }
+
+    function loadDemoCase(caseType) {
+      document.getElementById('demoMenu').classList.add('hidden');
+      lastAlertedMdroSignature = '';
+
+      if (caseType === 'cre_esbl') {
+        selectOrganism('enterobacterales');
+        drugInputs = {
+          'Ceftriaxone': { disk: '14', mic: '>=8' },
+          'Ceftazidime': { disk: '12', mic: '>=32' },
+          'Meropenem': { disk: '15', mic: '>=8' },
+          'Imipenem': { disk: '16', mic: '8' },
+          'Amikacin': { disk: '22', mic: '<=4' }
+        };
+      } else if (caseType === 'mrsa') {
+        selectOrganism('staph_aureus');
+        drugInputs = {
+          'Cefoxitin (Surrogate for Oxacillin)': { disk: '18', mic: '' },
+          'Oxacillin': { disk: '', mic: '>=4' },
+          'Vancomycin': { disk: '', mic: '1' },
+          'Clindamycin': { disk: '24', mic: '<=0.25' }
+        };
+      } else if (caseType === 'vre') {
+        selectOrganism('enterococcus');
+        drugInputs = {
+          'Ampicillin': { disk: '10', mic: '>=32' },
+          'Vancomycin': { disk: '10', mic: '>=32' },
+          'Linezolid': { disk: '25', mic: '2' }
+        };
+      } else if (caseType === 'crab') {
+        selectOrganism('acinetobacter');
+        drugInputs = {
+          'Meropenem': { disk: '10', mic: '>=16' },
+          'Imipenem': { disk: '12', mic: '>=16' },
+          'Ampicillin-sulbactam': { disk: '14', mic: '>=32/16' },
+          'Colistin / Polymyxin B': { disk: '', mic: '1' }
+        };
+      } else if (caseType === 'crab_i_only') {
+        selectOrganism('acinetobacter');
+        drugInputs = {
+          'Meropenem': { disk: '16', mic: '4' },
+          'Imipenem': { disk: '20', mic: '4' },
+          'Ampicillin-sulbactam': { disk: '24', mic: '<=4/2' }
+        };
+        showToast('โหลดเคส A. baumannii (ผล I) — ไม่แจ้งเตือน CRAB เพราะนับเฉพาะ R');
+      } else if (caseType === 'susceptible') {
+        selectOrganism('enterobacterales');
+        drugInputs = {
+          'Ampicillin': { disk: '20', mic: '<=4' },
+          'Ceftriaxone': { disk: '28', mic: '<=0.5' },
+          'Meropenem': { disk: '28', mic: '<=0.25' },
+          'Ciprofloxacin': { disk: '30', mic: '<=0.12' }
+        };
+      }
+      renderDrugTable();
+      updateStatsAndMDRO(true);
+    }
+
+    function clearAllInputs() {
+      drugInputs = {};
+      lastAlertedMdroSignature = '';
+      if (selectedOrganism) {
+        renderDrugTable();
+        updateStatsAndMDRO(false);
+      }
+      showToast('ล้างข้อมูลทั้งหมดเรียบร้อยแล้ว');
+    }
+
+    function copyReport() {
+      if (!selectedOrganism) {
+        showToast('กรุณาเลือกชื่อเชื้อก่อนคัดลอกรายงานผล');
+        return;
+      }
+      const lines = [];
+      lines.push(`=== รายงานผลความไวต่อยาต้านจุลชีพ (AST) ===`);
+      lines.push(`เชื้อ: ${selectedOrganism.shortName} (${selectedOrganism.source})`);
+      if (currentMdroAlerts.length > 0) {
+        lines.push(`แจ้งเตือนเชื้อดื้อยา (MDRO): ${currentMdroAlerts.map(a => a.code).join(', ')}`);
+      }
+      lines.push(`-------------------------------------------`);
+
+      let count = 0;
+      const allDrugs = [...selectedOrganism.drugs, ...customDrugs];
+      allDrugs.forEach(drug => {
+        const inp = drugInputs[drug.name];
+        if (!inp || (!inp.disk && !inp.mic)) return;
+        const { finalRes } = evaluateDrug(drug, inp);
+        count++;
+        const vals = [];
+        if (inp.disk) vals.push(`Disk: ${inp.disk} mm`);
+        if (inp.mic) vals.push(`MIC: ${inp.mic} µg/mL`);
+        lines.push(`- ${drug.name}: ${finalRes || '-'} (${vals.join(', ')})`);
+      });
+
+      if (count === 0) {
+        showToast('ยังไม่ได้กรอกค่ายาต้านจุลชีพใดๆ');
+        return;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = lines.join('\n');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('คัดลอกสรุปรายงานผลลงคลิปบอร์ดแล้ว');
+      } catch (e) {
+        showToast('ไม่สามารถคัดลอกได้ กรุณาลองใหม่');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    // =========================================================================
+    // 8. MULTI-ORGANISM PHOTO VERIFICATION (UPLOAD, PASTE, ZOOM, GEMINI AI)
+    // =========================================================================
+    const API_KEY_STORAGE = 'clsi_gemini_api_key';
+    const API_MODEL_STORAGE = 'clsi_gemini_model';
+
+    function getSavedApiKey() {
+      try {
+        return (localStorage.getItem(API_KEY_STORAGE) || '').trim();
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function getSavedModel() {
+      try {
+        return localStorage.getItem(API_MODEL_STORAGE) || 'gemini-2.5-flash';
+      } catch (e) {
+        return 'gemini-2.5-flash';
+      }
+    }
+
+    function updateApiStatusBadge() {
+      const badge = document.getElementById('apiStatusBadge');
+      if (!badge) return;
+      const key = getSavedApiKey();
+      if (key) {
+        badge.textContent = 'เชื่อมต่อ API แล้ว';
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200';
+      } else {
+        badge.textContent = 'ยังไม่ตั้งค่า API Key';
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200';
+      }
+    }
+
+    function openApiSettingsModal() {
+      const input = document.getElementById('geminiApiKeyInput');
+      const select = document.getElementById('geminiModelSelect');
+      const testBox = document.getElementById('apiTestResultBox');
+      if (input) {
+        input.value = getSavedApiKey();
+        input.type = 'password';
+      }
+      const visBtn = document.getElementById('toggleApiKeyVisBtn');
+      if (visBtn) visBtn.textContent = 'แสดง';
+      if (select) select.value = getSavedModel();
+      if (testBox) testBox.classList.add('hidden');
+      document.getElementById('apiSettingsModal').classList.remove('hidden');
+    }
+
+    function closeApiSettingsModal() {
+      document.getElementById('apiSettingsModal').classList.add('hidden');
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById('geminiApiKeyInput');
+      const btn = document.getElementById('toggleApiKeyVisBtn');
+      if (!input || !btn) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'ซ่อน';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'แสดง';
+      }
+    }
+
+    function saveApiSettings() {
+      const key = (document.getElementById('geminiApiKeyInput').value || '').trim();
+      const model = document.getElementById('geminiModelSelect').value || 'gemini-2.5-flash';
+      try {
+        if (key) localStorage.setItem(API_KEY_STORAGE, key);
+        else localStorage.removeItem(API_KEY_STORAGE);
+        localStorage.setItem(API_MODEL_STORAGE, model);
+      } catch (e) {
+        showToast('ไม่สามารถบันทึกข้อมูลลง LocalStorage ได้');
+        return;
+      }
+      updateApiStatusBadge();
+      closeApiSettingsModal();
+      showToast(key ? `บันทึก Gemini API Key (${model}) เรียบร้อยแล้ว` : 'บันทึกการตั้งค่าเรียบร้อยแล้ว');
+    }
+
+    function clearApiSettings() {
+      try {
+        localStorage.removeItem(API_KEY_STORAGE);
+      } catch (e) {}
+      const input = document.getElementById('geminiApiKeyInput');
+      if (input) input.value = '';
+      const testBox = document.getElementById('apiTestResultBox');
+      if (testBox) testBox.classList.add('hidden');
+      updateApiStatusBadge();
+      showToast('ล้าง Gemini API Key ออกจากเครื่องนี้แล้ว');
+    }
+
+    async function testApiConnection() {
+      const key = (document.getElementById('geminiApiKeyInput').value || '').trim();
+      const model = document.getElementById('geminiModelSelect').value || 'gemini-2.5-flash';
+      const testBox = document.getElementById('apiTestResultBox');
+      const testBtn = document.getElementById('testApiBtn');
+
+      if (!key) {
+        testBox.className = 'p-3 rounded-xl text-xs font-medium bg-amber-50 border border-amber-200 text-amber-800';
+        testBox.textContent = 'กรุณากรอก Gemini API Key ก่อนกดทดสอบการเชื่อมต่อ';
+        testBox.classList.remove('hidden');
+        return;
+      }
+
+      testBtn.disabled = true;
+      testBox.className = 'p-3 rounded-xl text-xs font-medium bg-sky-50 border border-sky-200 text-sky-800';
+      testBox.textContent = `กำลังทดสอบการเชื่อมต่อกับ ${model}...`;
+      testBox.classList.remove('hidden');
+
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(key)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: 'Reply with OK' }] }]
+          })
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData?.error?.message || `HTTP ${res.status}`);
+        }
+        testBox.className = 'p-3 rounded-xl text-xs font-medium bg-emerald-50 border border-emerald-200 text-emerald-800';
+        testBox.textContent = `✅ เชื่อมต่อสำเร็จ! พร้อมใช้งานโมเดล ${model} (อย่าลืมกด "บันทึกและใช้งาน")`;
+      } catch (err) {
+        testBox.className = 'p-3 rounded-xl text-xs font-medium bg-red-50 border border-red-200 text-red-700';
+        testBox.textContent = `❌ เชื่อมต่อไม่สำเร็จ: ${err.message || 'กรุณาตรวจสอบ API Key อีกครั้ง'}`;
+      } finally {
+        testBtn.disabled = false;
+      }
+    }
+
+    function triggerPhotoFileInput() {
+      document.getElementById('photoInput').click();
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.add('border-sky-500', 'bg-sky-50');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.remove('border-sky-500', 'bg-sky-50');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('dropZone').classList.remove('border-sky-500', 'bg-sky-50');
+      const file = e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) processImageFile(file);
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files && e.target.files[0];
+      if (file) processImageFile(file);
+    }
+
+    function processImageFile(file) {
+      if (!file.type.startsWith('image/')) {
+        showPhotoError('กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG, WebP)');
+        return;
+      }
+      hidePhotoError();
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        uploadedImageMime = file.type || 'image/png';
+        uploadedImageBase64 = dataUrl.split(',')[1];
+        imageZoom = 1;
+        imageRotation = 0;
+
+        const preview = document.getElementById('imagePreview');
+        preview.src = dataUrl;
+        applyImageTransform();
+        document.getElementById('zoomImage').src = dataUrl;
+        document.getElementById('uploadPlaceholder').classList.add('hidden');
+        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function adjustImageZoom(delta) {
+      imageZoom = Math.min(3, Math.max(0.5, imageZoom + delta));
+      applyImageTransform();
+    }
+
+    function rotatePreviewImage() {
+      imageRotation = (imageRotation + 90) % 360;
+      applyImageTransform();
+    }
+
+    function resetImageTransform() {
+      imageZoom = 1;
+      imageRotation = 0;
+      applyImageTransform();
+    }
+
+    function applyImageTransform() {
+      const preview = document.getElementById('imagePreview');
+      preview.style.transform = `scale(${imageZoom}) rotate(${imageRotation}deg)`;
+    }
+
+    function clearPhoto() {
+      uploadedImageBase64 = null;
+      uploadedImageMime = null;
+      document.getElementById('photoInput').value = '';
+      document.getElementById('uploadPlaceholder').classList.remove('hidden');
+      document.getElementById('imagePreviewContainer').classList.add('hidden');
+      hidePhotoError();
+    }
+
+    function openZoomModal() {
+      if (!uploadedImageBase64) return;
+      document.getElementById('zoomModal').classList.remove('hidden');
+    }
+
+    function closeZoomModal() {
+      document.getElementById('zoomModal').classList.add('hidden');
+    }
+
+    function showPhotoError(msg) {
+      const box = document.getElementById('photoErrorBox');
+      box.textContent = msg;
+      box.classList.remove('hidden');
+    }
+
+    function hidePhotoError() {
+      document.getElementById('photoErrorBox').classList.add('hidden');
+    }
+
+    async function fetchWithRetry(url, options, maxRetries = 3) {
+      let delay = 1000;
+      for (let i = 0; i < maxRetries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (res.ok) return res;
+          if (res.status === 429 || res.status >= 500) {
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 2;
+            continue;
+          }
+          return res;
+        } catch (err) {
+          if (i === maxRetries - 1) throw err;
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+        }
+      }
+      throw new Error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ AI ได้');
+    }
+
+    async function verifyPhotoWithAI() {
+      if (!uploadedImageBase64) {
+        showPhotoError('กรุณาแนบรูปถ่ายใบรายงานผลก่อนกดวิเคราะห์ด้วย AI');
+        showToast('กรุณาแนบรูปถ่ายก่อนวิเคราะห์ด้วย AI');
+        return;
+      }
+
+      const apiKey = getSavedApiKey();
+      const selectedModel = getSavedModel();
+      if (!apiKey) {
+        showToast('กรุณาตั้งค่า Gemini API Key ก่อนใช้งานระบบ AI อ่านรูปถ่าย');
+        openApiSettingsModal();
+        return;
+      }
+
+      hidePhotoError();
+      const btn = document.getElementById('verifyPhotoBtn');
+      btn.disabled = true;
+      document.getElementById('aiEmptyState').classList.add('hidden');
+      document.getElementById('auditIsolatesContainer').classList.add('hidden');
+      document.getElementById('aiLoadingState').classList.remove('hidden');
+
+      const prompt = `You are a clinical microbiology AST (Antimicrobial Susceptibility Testing) report reader.
+A single photo may contain ONE OR MULTIPLE bacterial isolates (e.g. Isolate 1: E. coli, Isolate 2: Pseudomonas aeruginosa).
+Extract ALL bacterial isolates separately and keep each isolate's antimicrobial results grouped under that isolate.
+Return ONLY valid JSON with this exact structure (no markdown fences, no extra text):
+{
+  "isolates": [
+    {
+      "organism": "Organism name as shown in image",
+      "results": [
+        {
+          "drug": "Antimicrobial name",
+          "disk_mm": "Zone diameter number in mm if present, else empty string",
+          "mic_ugml": "MIC value with operator like <=0.5 or >=16 if present, else empty string",
+          "reported_interpretation": "S, I, SDD, R, or NS as printed in the report, else empty string"
+        }
+      ]
+    }
+  ]
+}`;
+
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(selectedModel)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+      const payload = {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              { text: prompt },
+              {
+                inlineData: {
+                  mimeType: uploadedImageMime || "image/png",
+                  data: uploadedImageBase64
+                }
+              }
+            ]
+          }
+        ],
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
+      };
+
+      try {
+        const response = await fetchWithRetry(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const result = await response.json();
+        let rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        rawText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+
+        const parsed = JSON.parse(rawText);
+        const rawIsolates = Array.isArray(parsed.isolates) && parsed.isolates.length > 0
+          ? parsed.isolates
+          : [{ organism: parsed.organism || 'ไม่ระบุ', results: parsed.results || [] }];
+
+        auditIsolates = rawIsolates.map(iso => {
+          const matchedOrg = matchOrganismByName(iso.organism);
+          return {
+            id: auditIsolateSeq++,
+            rawOrganism: iso.organism || 'ไม่ระบุ',
+            matchedOrgId: matchedOrg ? matchedOrg.id : '',
+            rows: (iso.results || []).map(item => ({
+              drug: item.drug || '',
+              disk_mm: item.disk_mm || '',
+              mic_ugml: item.mic_ugml || '',
+              reported: (item.reported_interpretation || '').trim().toUpperCase()
+            }))
+          };
+        });
+
+        document.getElementById('aiLoadingState').classList.add('hidden');
+        renderAllAuditIsolates(true);
+        showToast(`วิเคราะห์รูปถ่ายสำเร็จ พบ ${auditIsolates.length} เชื้อ เทียบเกณฑ์ CLSI 2026 เรียบร้อยแล้ว`);
+      } catch (err) {
+        document.getElementById('aiLoadingState').classList.add('hidden');
+        showPhotoError('ไม่สามารถวิเคราะห์รูปภาพด้วย AI ได้ในขณะนี้ (' + (err.message || 'Network/API Error') + ') — ระบบเปิดตารางกรอกค่าตรวจสอบด้วยตาเองให้ด้านขวาแล้ว');
+        if (auditIsolates.length === 0) startManualPhotoAudit();
+        else renderAllAuditIsolates(false);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function matchOrganismByName(rawName) {
+      if (!rawName) return null;
+      const q = rawName.toLowerCase().trim();
+      for (const org of ORGANISM_DB) {
+        if (org.shortName.toLowerCase() === q || org.name.toLowerCase().includes(q)) return org;
+        if (org.aliases.some(a => q.includes(a) || a.includes(q))) return org;
+      }
+      return null;
+    }
+
+    function matchDrugInOrg(org, rawDrug) {
+      if (!org || !rawDrug) return null;
+      const q = rawDrug.toLowerCase().trim();
+      for (const d of org.drugs) {
+        const dName = d.name.toLowerCase();
+        const baseName = dName.split(' (')[0];
+        if (dName === q || baseName === q || dName.includes(q) || q.includes(baseName)) return d;
+        if ((d.abbr || []).some(a => a.toLowerCase() === q)) return d;
+      }
+      return null;
+    }
+
+    function startManualPhotoAudit() {
+      const defaultOrgId = selectedOrganism ? selectedOrganism.id : 'enterobacterales';
+      auditIsolates = [{
+        id: auditIsolateSeq++,
+        rawOrganism: 'เชื้อที่ 1 (ตรวจสอบด้วยตาเอง)',
+        matchedOrgId: defaultOrgId,
+        rows: [
+          { drug: '', disk_mm: '', mic_ugml: '', reported: '' },
+          { drug: '', disk_mm: '', mic_ugml: '', reported: '' },
+          { drug: '', disk_mm: '', mic_ugml: '', reported: '' }
+        ]
+      }];
+      document.getElementById('aiLoadingState').classList.add('hidden');
+      renderAllAuditIsolates(false);
+    }
+
+    function loadMultiOrganismPhotoDemo() {
+      hidePhotoError();
+      auditIsolates = [
+        {
+          id: auditIsolateSeq++,
+          rawOrganism: 'Escherichia coli (Isolate #1)',
+          matchedOrgId: 'enterobacterales',
+          rows: [
+            { drug: 'Ceftriaxone', disk_mm: '15', mic_ugml: '>=8', reported: 'R' },
+            { drug: 'Ceftazidime', disk_mm: '14', mic_ugml: '16', reported: 'S' },
+            { drug: 'Meropenem', disk_mm: '27', mic_ugml: '<=0.25', reported: 'S' },
+            { drug: 'Amikacin', disk_mm: '22', mic_ugml: '<=4', reported: 'S' }
+          ]
+        },
+        {
+          id: auditIsolateSeq++,
+          rawOrganism: 'Pseudomonas aeruginosa (Isolate #2)',
+          matchedOrgId: 'pseudomonas_aeruginosa',
+          rows: [
+            { drug: 'Meropenem', disk_mm: '12', mic_ugml: '>=8', reported: 'R' },
+            { drug: 'Imipenem', disk_mm: '17', mic_ugml: '4', reported: 'I' },
+            { drug: 'Ceftazidime', disk_mm: '20', mic_ugml: '4', reported: 'S' },
+            { drug: 'Ciprofloxacin', disk_mm: '26', mic_ugml: '<=0.5', reported: 'S' }
+          ]
+        }
+      ];
+      document.getElementById('aiLoadingState').classList.add('hidden');
+      renderAllAuditIsolates(true);
+      showToast('โหลดเคสตัวอย่าง 2 เชื้อในรูปเดียว (E. coli ESBL + P. aeruginosa CRPA)');
+    }
+
+    function addAuditIsolate() {
+      auditIsolates.push({
+        id: auditIsolateSeq++,
+        rawOrganism: `เชื้อที่ ${auditIsolates.length + 1}`,
+        matchedOrgId: 'enterobacterales',
+        rows: [
+          { drug: '', disk_mm: '', mic_ugml: '', reported: '' },
+          { drug: '', disk_mm: '', mic_ugml: '', reported: '' }
+        ]
+      });
+      renderAllAuditIsolates(false);
+    }
+
+    function removeAuditIsolate(isoIdx) {
+      auditIsolates.splice(isoIdx, 1);
+      renderAllAuditIsolates(false);
+    }
+
+    function onAuditIsolateFieldChange(isoIdx, field, value) {
+      if (!auditIsolates[isoIdx]) return;
+      auditIsolates[isoIdx][field] = value;
+      if (field === 'matchedOrgId') {
+        renderAllAuditIsolates(false);
+      }
+    }
+
+    function onAuditIsolateRowChange(isoIdx, rowIdx, field, value) {
+      if (!auditIsolates[isoIdx] || !auditIsolates[isoIdx].rows[rowIdx]) return;
+      auditIsolates[isoIdx].rows[rowIdx][field] = value;
+    }
+
+    function addAuditIsolateRow(isoIdx) {
+      if (!auditIsolates[isoIdx]) return;
+      auditIsolates[isoIdx].rows.push({ drug: '', disk_mm: '', mic_ugml: '', reported: '' });
+      renderAllAuditIsolates(false);
+    }
+
+    function removeAuditIsolateRow(isoIdx, rowIdx) {
+      if (!auditIsolates[isoIdx]) return;
+      auditIsolates[isoIdx].rows.splice(rowIdx, 1);
+      renderAllAuditIsolates(false);
+    }
+
+    function buildMappedInputsForIsolate(iso, matchedOrg) {
+      const mapped = {};
+      if (!matchedOrg) return mapped;
+      iso.rows.forEach(item => {
+        const matchedDrug = matchDrugInOrg(matchedOrg, item.drug);
+        if (matchedDrug && (item.disk_mm || item.mic_ugml)) {
+          mapped[matchedDrug.name] = { disk: item.disk_mm || '', mic: item.mic_ugml || '' };
+        }
+      });
+      return mapped;
+    }
+
+    function recalculateSingleAuditIsolate(isoIdx) {
+      renderAllAuditIsolates(false);
+      const iso = auditIsolates[isoIdx];
+      if (!iso) return;
+      const matchedOrg = ORGANISM_DB.find(o => o.id === iso.matchedOrgId);
+      if (matchedOrg) {
+        const mappedInputs = buildMappedInputsForIsolate(iso, matchedOrg);
+        const alerts = detectMdroForDataset(matchedOrg, mappedInputs);
+        if (alerts.length > 0) {
+          currentMdroModalGroups = [{ orgLabel: `เชื้อที่ ${isoIdx + 1}: ${iso.rawOrganism || matchedOrg.shortName}`, alerts }];
+          updateMdroUI(true);
+        }
+      }
+      showToast(`คำนวณผลลัพธ์เชื้อที่ ${isoIdx + 1} ใหม่เรียบร้อยแล้ว`);
+    }
+
+    function recalculateAllAuditIsolates(triggerMdroPopup = true) {
+      renderAllAuditIsolates(triggerMdroPopup);
+      if (triggerMdroPopup) {
+        showToast(`คำนวณผลลัพธ์ใหม่ครบทั้ง ${auditIsolates.length} เชื้อเรียบร้อยแล้ว`);
+      }
+    }
+
+    function renderAllAuditIsolates(triggerMdroPopup = false) {
+      const container = document.getElementById('auditIsolatesContainer');
+      const emptyEl = document.getElementById('aiEmptyState');
+      const recalcAllBtn = document.getElementById('recalcAllAuditBtn');
+
+      if (auditIsolates.length === 0) {
+        container.classList.add('hidden');
+        recalcAllBtn.classList.add('hidden');
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+      container.classList.remove('hidden');
+      recalcAllBtn.classList.remove('hidden');
+
+      const cardColors = [
+        { border: 'border-sky-200', headerBg: 'bg-sky-50/80', badge: 'bg-sky-600 text-white' },
+        { border: 'border-indigo-200', headerBg: 'bg-indigo-50/80', badge: 'bg-indigo-600 text-white' },
+        { border: 'border-teal-200', headerBg: 'bg-teal-50/80', badge: 'bg-teal-600 text-white' },
+        { border: 'border-violet-200', headerBg: 'bg-violet-50/80', badge: 'bg-violet-600 text-white' }
+      ];
+
+      const consolidatedMdroGroups = [];
+
+      container.innerHTML = auditIsolates.map((iso, isoIdx) => {
+        const theme = cardColors[isoIdx % cardColors.length];
+        const matchedOrg = ORGANISM_DB.find(o => o.id === iso.matchedOrgId) || null;
+        const datalistId = `auditDrugList_${iso.id}`;
+
+        let total = 0, matchCount = 0, discCount = 0, reviewCount = 0;
+        const mappedInputs = {};
+
+        const rowsHtml = iso.rows.map((item, rowIdx) => {
+          total++;
+          const matchedDrug = matchDrugInOrg(matchedOrg, item.drug);
+          const reported = (item.reported || '').trim().toUpperCase();
+          let expected = null;
+          let discordant = false;
+
+          if (matchedDrug) {
+            const evalRes = evaluateDrug(matchedDrug, { disk: item.disk_mm, mic: item.mic_ugml });
+            expected = evalRes.finalRes;
+            discordant = evalRes.discordant;
+            if (item.disk_mm || item.mic_ugml) {
+              mappedInputs[matchedDrug.name] = { disk: item.disk_mm || '', mic: item.mic_ugml || '' };
+            }
+          }
+
+          let statusBadge = '';
+          let rowBg = '';
+          if (!matchedDrug && item.drug) {
+            reviewCount++;
+            rowBg = 'bg-slate-50';
+            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 text-slate-700">ไม่พบเกณฑ์</span>`;
+          } else if (expected && reported) {
+            if (expected === reported) {
+              matchCount++;
+              statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">ตรงเกณฑ์</span>`;
+            } else {
+              discCount++;
+              rowBg = 'bg-red-50/70';
+              statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-800 border border-red-300">ไม่ตรงเกณฑ์!</span>`;
+            }
+          } else {
+            reviewCount++;
+            rowBg = 'bg-amber-50/40';
+            statusBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-200">ตรวจด้วยตา</span>`;
+          }
+
+          const repOptions = ['', 'S', 'I', 'SDD', 'R', 'NS'].map(opt =>
+            `<option value="${opt}" ${reported === opt ? 'selected' : ''}>${opt || '-'}</option>`
+          ).join('');
+
+          return `
+            <tr class="${rowBg}">
+              <td class="py-2 px-2">
+                <input
+                  type="text"
+                  list="${datalistId}"
+                  value="${escapeAttr(item.drug)}"
+                  placeholder="พิมพ์ชื่อยา..."
+                  oninput="onAuditIsolateRowChange(${isoIdx}, ${rowIdx}, 'drug', this.value)"
+                  class="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-800 focus:ring-1 focus:ring-sky-500"
+                />
+              </td>
+              <td class="py-2 px-1.5">
+                <input
+                  type="number"
+                  step="1"
+                  value="${escapeAttr(item.disk_mm)}"
+                  placeholder="mm"
+                  oninput="onAuditIsolateRowChange(${isoIdx}, ${rowIdx}, 'disk_mm', this.value)"
+                  class="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-sky-500"
+                />
+              </td>
+              <td class="py-2 px-1.5">
+                <input
+                  type="text"
+                  value="${escapeAttr(item.mic_ugml)}"
+                  placeholder="MIC"
+                  oninput="onAuditIsolateRowChange(${isoIdx}, ${rowIdx}, 'mic_ugml', this.value)"
+                  class="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white text-xs focus:ring-1 focus:ring-sky-500"
+                />
+              </td>
+              <td class="py-2 px-1.5 text-center">
+                <select
+                  onchange="onAuditIsolateRowChange(${isoIdx}, ${rowIdx}, 'reported', this.value)"
+                  class="w-full px-1 py-1 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-700 focus:ring-1 focus:ring-sky-500"
+                >${repOptions}</select>
+              </td>
+              <td class="py-2 px-1.5 text-center">
+                ${expected ? `<span class="px-2 py-0.5 rounded font-bold text-xs badge-${expected}">${expected}</span>` : '<span class="text-slate-400">-</span>'}
+                ${discordant ? `<div class="text-[10px] font-bold text-red-600 mt-0.5">Disk≠MIC</div>` : ''}
+              </td>
+              <td class="py-2 px-2 text-center">${statusBadge}</td>
+              <td class="py-2 px-1.5 text-center">
+                <button type="button" onclick="removeAuditIsolateRow(${isoIdx}, ${rowIdx})" class="text-slate-400 hover:text-red-600 p-1 cursor-pointer" title="ลบแถวนี้">✕</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        const isoAlerts = matchedOrg ? detectMdroForDataset(matchedOrg, mappedInputs) : [];
+        if (isoAlerts.length > 0) {
+          consolidatedMdroGroups.push({
+            orgLabel: `เชื้อที่ ${isoIdx + 1}: ${iso.rawOrganism || matchedOrg.shortName}`,
+            alerts: isoAlerts
+          });
+        }
+
+        const orgOptionsHtml = `<option value="">-- เลือกกลุ่มเชื้อตาม CLSI --</option>` + ORGANISM_DB.map(o =>
+          `<option value="${o.id}" ${o.id === iso.matchedOrgId ? 'selected' : ''}>${escapeHtml(o.shortName)} (${escapeHtml(o.source)})</option>`
+        ).join('');
+
+        const datalistOptionsHtml = matchedOrg
+          ? matchedOrg.drugs.map(d => `<option value="${escapeAttr(d.name)}"></option>`).join('')
+          : '';
+
+        return `
+          <div class="bg-white rounded-2xl border-2 ${theme.border} shadow-sm overflow-hidden">
+            <div class="${theme.headerBg} px-4 py-3 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${theme.badge}">เชื้อที่ ${isoIdx + 1}</span>
+                <input
+                  type="text"
+                  value="${escapeAttr(iso.rawOrganism)}"
+                  oninput="onAuditIsolateFieldChange(${isoIdx}, 'rawOrganism', this.value)"
+                  placeholder="ชื่อเชื้อที่พบในรูป..."
+                  class="px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-xs sm:text-sm font-bold text-slate-800 focus:ring-2 focus:ring-sky-500 w-56 sm:w-64"
+                />
+                ${isoAlerts.map(a => `<span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[11px] font-bold shadow-sm">${escapeHtml(a.code)}</span>`).join('')}
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="applySingleAuditToMain(${isoIdx})" class="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition cursor-pointer">ส่งไปหน้าหลัก</button>
+                <button type="button" onclick="removeAuditIsolate(${isoIdx})" class="px-2.5 py-1.5 rounded-lg bg-white hover:bg-red-50 text-red-600 border border-red-200 text-xs font-semibold transition cursor-pointer">ลบเชื้อนี้</button>
+              </div>
+            </div>
+
+            <div class="p-4 space-y-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div class="flex items-center gap-2 flex-1">
+                  <label class="text-xs font-semibold text-slate-600 shrink-0">เกณฑ์ CLSI:</label>
+                  <select onchange="onAuditIsolateFieldChange(${isoIdx}, 'matchedOrgId', this.value)" class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs text-slate-800 focus:ring-2 focus:ring-sky-500">
+                    ${orgOptionsHtml}
+                  </select>
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-semibold">
+                  <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-700">ยา: ${total}</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">ตรง: ${matchCount}</span>
+                  <span class="px-2 py-0.5 rounded bg-red-100 text-red-800">ไม่ตรง: ${discCount}</span>
+                  <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800">ตรวจตา: ${reviewCount}</span>
+                </div>
+              </div>
+
+              ${matchedOrg && matchedOrg.intrinsic ? `
+                <div class="text-[11px] text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">
+                  <strong>Intrinsic Resistance:</strong> ${escapeHtml(matchedOrg.intrinsic)}
+                </div>
+              ` : ''}
+
+              <datalist id="${datalistId}">${datalistOptionsHtml}</datalist>
+
+              <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr class="bg-slate-100 border-b border-slate-200 text-slate-600 font-bold">
+                      <th class="py-2 px-2 min-w-[140px]">ชื่อยา (แก้ไขได้)</th>
+                      <th class="py-2 px-1.5 w-20">Disk (mm)</th>
+                      <th class="py-2 px-1.5 w-24">MIC (µg/mL)</th>
+                      <th class="py-2 px-1.5 w-20 text-center">ในรูป</th>
+                      <th class="py-2 px-1.5 w-20 text-center">CLSI 2026</th>
+                      <th class="py-2 px-2 text-center min-w-[95px]">สถานะ</th>
+                      <th class="py-2 px-1.5 w-8 text-center">ลบ</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    ${rowsHtml || `<tr><td colspan="7" class="py-5 text-center text-slate-400">ยังไม่มีรายการยา กด "+ เพิ่มแถวยา"</td></tr>`}
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                <button type="button" onclick="addAuditIsolateRow(${isoIdx})" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 text-xs font-semibold transition cursor-pointer">
+                  + เพิ่มแถวยา
+                </button>
+                <button type="button" onclick="recalculateSingleAuditIsolate(${isoIdx})" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition cursor-pointer">
+                  คำนวณผลลัพธ์ใหม่ (เชื้อที่ ${isoIdx + 1})
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (triggerMdroPopup) {
+        currentMdroModalGroups = consolidatedMdroGroups;
+        updateMdroUI(consolidatedMdroGroups.length > 0);
+      }
+    }
+
+    function applySingleAuditToMain(isoIdx) {
+      const iso = auditIsolates[isoIdx];
+      if (!iso) return;
+      const matchedOrg = ORGANISM_DB.find(o => o.id === iso.matchedOrgId);
+      if (!matchedOrg) {
+        showToast('กรุณาเลือกกลุ่มเชื้อ CLSI ก่อนส่งข้อมูลลงตารางหลัก');
+        return;
+      }
+      const mappedInputs = buildMappedInputsForIsolate(iso, matchedOrg);
+      window.switchTab('manual');
+      lastAlertedMdroSignature = '';
+      selectOrganism(matchedOrg.id);
+      drugInputs = { ...mappedInputs };
+      renderDrugTable();
+      updateStatsAndMDRO(true);
+      showToast(`ส่งข้อมูลเชื้อที่ ${isoIdx + 1} (${matchedOrg.shortName}) ลงตารางหลักเรียบร้อยแล้ว`);
+    }
+
+    // =========================================================================
+    // 9. UTILITIES & INITIALIZATION
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = msg;
+      el.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('hidden'), 3500);
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+    function escapeAttr(str) {
+      return String(str ?? '').replace(/"/g, '&quot;');
+    }
+    function escapeJs(str) {
+      return String(str ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Bind Tab Buttons cleanly
+      const btnManual = document.getElementById('tabBtnManual');
+      const btnPhoto = document.getElementById('tabBtnPhoto');
+      if (btnManual) btnManual.addEventListener('click', () => window.switchTab('manual'));
+      if (btnPhoto) btnPhoto.addEventListener('click', () => window.switchTab('photo'));
+
+      // Bind Organism Autocomplete
+      const orgSearchInput = document.getElementById('organismSearch');
+      const orgDropdown = document.getElementById('organismDropdown');
+      const clearOrgBtn = document.getElementById('clearOrgBtn');
+
+      if (orgSearchInput) {
+        orgSearchInput.addEventListener('focus', () => renderOrganismDropdown(orgSearchInput.value));
+        orgSearchInput.addEventListener('input', (e) => {
+          clearOrgBtn.classList.toggle('hidden', !e.target.value);
+          renderOrganismDropdown(e.target.value);
+        });
+      }
+
+      // Close dropdowns on outside click
+      document.addEventListener('click', (e) => {
+        if (orgSearchInput && orgDropdown && !orgSearchInput.contains(e.target) && !orgDropdown.contains(e.target)) {
+          orgDropdown.classList.add('hidden');
+        }
+        const demoMenu = document.getElementById('demoMenu');
+        if (demoMenu && !demoMenu.parentElement.contains(e.target)) {
+          demoMenu.classList.add('hidden');
+        }
+      });
+
+      // Clipboard Paste (Ctrl+V) for Photo Audit Tab
+      document.addEventListener('paste', (e) => {
+        const photoSec = document.getElementById('sectionPhoto');
+        if (!photoSec || photoSec.classList.contains('hidden')) return;
+        const items = (e.clipboardData || e.originalEvent.clipboardData)?.items;
+        if (!items) return;
+        for (const item of items) {
+          if (item.type.indexOf('image') !== -1) {
+            const blob = item.getAsFile();
+            if (blob) {
+              processImageFile(blob);
+              showToast('วางรูปภาพจากคลิปบอร์ดเรียบร้อยแล้ว');
+              break;
+            }
+          }
+        }
+      });
+
+      // Default selection
+      updateApiStatusBadge();
+      selectOrganism('enterobacterales');
+    });
+  </script>
+</body>
+</html>
